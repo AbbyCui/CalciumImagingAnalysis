@@ -1,0 +1,46 @@
+#run the following in terminal 
+python path/to/pythonFile, path/to/dataFile
+e.g.
+    python ProcessData.py
+    python InterSpikeInterval.py
+    python Plot.py
+
+or
+# takes the most time, but only need to do it once
+    python ProcessData.py "#1" "P0"
+    python ProcessData.py "#1" "P1"
+    python ProcessData.py "#1" "P2"
+    python ProcessData.py "#1" "P3"
+    python ProcessData.py "#1" "P4"
+    python ProcessData.py "#1" "P5"
+
+    python ProcessData.py "#3" "P0"
+    python ProcessData.py "#3" "P1"
+    python ProcessData.py "#3" "P2"
+    python ProcessData.py "#3" "P3"
+    python ProcessData.py "#3" "P4"
+
+# raw screening of bad ROIs, also get a sense of how to analyze
+    python Plot.py "P0" 1 46200
+    python Plot.py "P1" 1 46200
+    python Plot.py "P2" 1 46200
+    python Plot.py "P3" 1 46200
+    python Plot.py "P4" 1 46200
+
+# manually remove ROIs with too much z-drift, or dead ones
+# (put ROI number of the bad ROIs in an excel sheet, with "P0", 
+# "P1" etc as first row, then ROI numbers in the corresponding columns)
+
+    python InterSpikeInterval.py "P0" 2100 40000
+    python InterSpikeInterval.py "P1" 2100 40000
+    python InterSpikeInterval.py "P2" 2100 40000
+    python InterSpikeInterval.py "P3" 2100 40000
+    python InterSpikeInterval.py "P4" 2100 40000
+    python InterSpikeInterval.py "P5" 2100 40000
+
+    python MaxResponse.py "P0"
+    python MaxResponse.py "P1"
+    python MaxResponse.py "P2"
+    python MaxResponse.py "P3"
+    python MaxResponse.py "P4"
+

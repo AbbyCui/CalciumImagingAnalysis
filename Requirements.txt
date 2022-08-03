@@ -1,0 +1,6 @@
+#Run the following to install packages
+py -m pip install "numpy"
+py -m pip install "plotly"
+py -m pip install "pandas"
+py -m pip install "scipy"
+python -m pip install -U matplotlib
