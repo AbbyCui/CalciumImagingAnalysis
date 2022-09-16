@@ -1,6 +1,9 @@
 """
 import raw data, normalize, smooth, then calculate the threshold for each ROI (0.5 or baselineMean+4*SD, which ever is bigger)
 """
+
+#TODO add moving threshold feature (refer to google collab)
+
 from cmath import log
 from pandas import array
 import Utility_working as Utility #custom-made utility file, contains lengthy functions
@@ -12,6 +15,7 @@ import plotly.express as px
 from scipy.fft import fft, fftfreq
 from scipy import signal
 import sys
+import os
 import matplotlib.pyplot as plt
 from constant import *
 
@@ -25,6 +29,10 @@ try:
     splPrefix = expNumber + "_" + planeNumber+ "_"
 except:
     print("Starting ProcessData.py with constants in constant.py")
+
+# if OutputData folder doesn't exist, create new one
+if not os.path.exists(pathToOutputData[:-1]):
+    os.makedirs(pathToOutputData[:-1])
 
 # import raw data
 data, TotalTime, TotalROIs = Utility.importDataFile(debug, pathToRaw + "Results.csv") #import and format data

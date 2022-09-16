@@ -7,25 +7,33 @@ e.g.
 
 or
 # takes the most time, but only need to do it once
-    python ProcessData.py "#1" "P0"
-    python ProcessData.py "#1" "P1"
-    python ProcessData.py "#1" "P2"
-    python ProcessData.py "#1" "P3"
-    python ProcessData.py "#1" "P4"
-    python ProcessData.py "#1" "P5"
+    python ProcessData.py "#468" "P0"
+    python ProcessData.py "#468" "P1"
+    python ProcessData.py "#468" "P2"
+    python ProcessData.py "#468" "P3"
+    python ProcessData.py "#468" "P4"
 
-    python ProcessData.py "#3" "P0"
-    python ProcessData.py "#3" "P1"
-    python ProcessData.py "#3" "P2"
-    python ProcessData.py "#3" "P3"
-    python ProcessData.py "#3" "P4"
 
 # raw screening of bad ROIs, also get a sense of how to analyze
-    python Plot.py "P0" 1 46200
-    python Plot.py "P1" 1 46200
-    python Plot.py "P2" 1 46200
-    python Plot.py "P3" 1 46200
-    python Plot.py "P4" 1 46200
+    
+    python Plot.py "P0" 1 "all" 
+    python Plot.py "P1" 1 "all"
+    python Plot.py "P2" 1 "all"
+    python Plot.py "P3" 1 "all"
+    python Plot.py "P4" 1 "all"
+    
+    python Plot.py "P0" 52000 58000 
+    python Plot.py "P1" 52000 58000
+    python Plot.py "P2" 52000 58000
+    python Plot.py "P3" 52000 58000
+    python Plot.py "P4" 52000 58000
+
+    python Plot.py "P0" 14000 28000 
+    python Plot.py "P1" 14000 28000
+    python Plot.py "P2" 14000 28000
+    python Plot.py "P3" 14000 28000
+    python Plot.py "P4" 14000 28000 
+
 
 # manually remove ROIs with too much z-drift, or dead ones
 # (put ROI number of the bad ROIs in an excel sheet, with "P0", 
@@ -43,4 +51,11 @@ or
     python MaxResponse.py "P2"
     python MaxResponse.py "P3"
     python MaxResponse.py "P4"
+    python MaxResponse.py "P5"
 
+    python ProcessData.py "#2" "P0"
+    python ProcessData.py "#2" "P1"
+    python ProcessData.py "#2" "P2"
+    python Plot.py "P0" 1 "all" 
+    python Plot.py "P1" 1 "all"
+    python Plot.py "P2" 1 "all"

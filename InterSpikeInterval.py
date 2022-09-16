@@ -13,6 +13,7 @@ import sys
 import matplotlib.pyplot as plt
 from constant import *
 
+#TODO: Allow python to generate OUtputdata and Figure folders
 ##if want to customize some varibles, can enter them in terminal (see Unit Test.txt for example)
 try:
     planeNumber = sys.argv[1]
@@ -33,17 +34,20 @@ except:
     AllROIsToRemove = np.zeros((3, 6))
     print("plotting all ROIs")
 
+#import smoothed data
 data = np.loadtxt(pathToOutputData + splPrefix +"Smoothed.csv",delimiter=',',dtype=str)
+AllThresholds = np.loadtxt(pathToOutputData + prefix +"AllThresholds.csv",delimiter=',',dtype=str)
 ROIsToRemove=Utility.getROIsToRemove(debug, AllROIsToRemove, plane = planeNumber)
 ROIdata = Utility.extractData(debug, data, ROIs, ROIsToRemove, stimStart = stimStart, stimEnd = stimEnd) 
 
-Starts,Ends,spikesInOnes = Utility.extractEvent(debug, ROIdata, threshold, baselineStart,baselineEnd)
+Starts,Ends = Utility.extractEvent(debug, ROIdata, threshold, baselineStart,baselineEnd)
 eventNumber = Utility.eventCounter(debug, Starts)
 ISI = Utility.ISI(debug, ROIdata, Starts)
 eventAmp = Utility.getEventAmp(debug, ROIdata, Starts, Ends)
 
-# np.savetxt(pathToOutputData + prefix + "Starts.csv", Starts, delimiter=',', comments='', fmt='%s')
-# np.savetxt(pathToOutputData + prefix + "Ends.csv", Ends, delimiter=',', comments='', fmt='%s')
+
+np.savetxt(pathToOutputData + prefix + "Starts.csv", Starts, delimiter=',', comments='', fmt='%s')
+np.savetxt(pathToOutputData + prefix + "Ends.csv", Ends, delimiter=',', comments='', fmt='%s')
 np.savetxt(pathToOutputData + expNumber + "_" + planeNumber + "_" + "AllThresholds.csv", AllThresholds, delimiter=',', comments='', fmt='%s')
 znp.savetxt(pathToOutputData + prefix + "EventNumber.csv", eventNumber, delimiter=',', comments='', fmt='%s')
 np.savetxt(pathToOutputData + prefix + "ROINames.csv", ROIdata[0,...], delimiter=',', comments='', fmt='%s')

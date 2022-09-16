@@ -10,9 +10,9 @@ import numpy as np
 debug = True
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
 # and Figure(output figures)
-parentFolder = "#3"
+parentFolder = "#468"
 #to be added to each file name
-planeNumber= "P0"
+planeNumber= "try"
 #start of the stimulus (in frames, cannot be 0, must be >=1)
 #input stimStart = "all" if want the entirety of the recording
 stimStart = 1
@@ -25,6 +25,9 @@ baselineStart = 1
 
 #end of baseline (used to measure noise)
 baselineEnd = 2000
+
+#Frame per second for the experiment (used only in Plot.py)
+fps = 7.4
 
 expNumber = parentFolder
 #path to raw data
@@ -41,7 +44,7 @@ pathToOutputData = "../"+parentFolder+"/"+"OutputData/"
 pathToFigure = "../"+parentFolder+"/"+"Figure/"
 
 #ROIs of interest if say np.arrange (1,3), then will only include ROI 1 and 2
-# ROIs = np.array([1])
+# ROIs = np.array([52,53])
 ROIs = 'all'
 
 #the prefix to add before all OutputData and Figures
