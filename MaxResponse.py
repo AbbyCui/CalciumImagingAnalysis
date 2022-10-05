@@ -5,8 +5,6 @@ OUTPUT: csv with ROI names as horizontal headers. Contains max response of each 
     without an event during the stimulus window, the maxResponse would be 0. the lower half of the sheet contains "Res_" + stimulus 
     names as headers, and "0" indicating no response or "1" indicating a response
 '''
-
-
 from pandas import array
 import Utility_working as Utility #custom-made utility file, contains lengthy functions
 from gettext import install
@@ -41,11 +39,12 @@ except:
 #import smoothed data and stimulus files
 data = np.loadtxt(pathToOutputData + splPrefix +"Smoothed.csv",delimiter=',',dtype=str)
 stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str)
+AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",delimiter=',',dtype=str)
 stimNum = stimulus.shape[0]
 
 #extract only the desired ROIs (extract all frames)
 ROIdata = Utility.extractData(debug, data, ROIs, ROIsToRemove, stimStart = 1, stimEnd = "all") 
-Starts,Ends = Utility.extractEvent(debug, ROIdata, threshold, baselineStart,baselineEnd)
+Starts,Ends = Utility.extractEvent(debug, ROIdata, stimulus, AllThresholds)
 ROInum = ROIdata.shape[1]-1
 
 #initialize maxResponse with the same number of rows as stimulus, 

@@ -1,18 +1,21 @@
 """
 This python file include all constants. Change them here, and the changes will apply to all python file that you run afterwards
 """
-
 from scipy import signal
-import sys
 import numpy as np
 
+##################################### BELOW ARE THE MOST IMPORTANT VARIABLES TO MODIFY#####################
+
 #set debug to True to show all debugging statements, and set to False to hide all (also saves time)
-debug = True
+debug = False
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
 # and Figure(output figures)
 parentFolder = "#468"
 #to be added to each file name
-planeNumber= "try"
+planeNumber= "P2"
+#Frame per second for the experiment (used only in Plot.py)
+fps = 7.4
+
 #start of the stimulus (in frames, cannot be 0, must be >=1)
 #input stimStart = "all" if want the entirety of the recording
 stimStart = 1
@@ -21,13 +24,20 @@ stimStart = 1
 stimEnd = "all"
 
 #start of baseline
-baselineStart = 1
+baselineStart = 13500
 
 #end of baseline (used to measure noise)
-baselineEnd = 2000
+baselineEnd = 13900
 
-#Frame per second for the experiment (used only in Plot.py)
-fps = 7.4
+#ROIs of interest if say np.arrange (1,3), then will only include ROI 1 and 2
+# ROIs = np.array([52,53])
+ROIs = 'all'
+
+######### for SpikePattern.py ###########
+#user-defined index of stimulus to look at (based off of stimulus.csv). 
+stimIndex = 19
+
+##############################################################################################################
 
 expNumber = parentFolder
 #path to raw data
@@ -42,10 +52,6 @@ pathToOutputData = "../"+parentFolder+"/"+"OutputData/"
 # OutPath = '../#2_Output/'
 
 pathToFigure = "../"+parentFolder+"/"+"Figure/"
-
-#ROIs of interest if say np.arrange (1,3), then will only include ROI 1 and 2
-# ROIs = np.array([52,53])
-ROIs = 'all'
 
 #the prefix to add before all OutputData and Figures
 prefix = expNumber + "_" + planeNumber+ " _frm" + str(stimStart) + "-"+ str(stimEnd)+ "_" 

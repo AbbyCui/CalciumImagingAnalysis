@@ -3,20 +3,10 @@ import raw data, normalize, smooth, then calculate the threshold for each ROI (0
 """
 
 #TODO add moving threshold feature (refer to google collab)
-
-from cmath import log
-from pandas import array
 import Utility_working as Utility #custom-made utility file, contains lengthy functions
-from gettext import install
 import numpy as np
-import matplotlib.pyplot as plt
-import csv
-import plotly.express as px
-from scipy.fft import fft, fftfreq
-from scipy import signal
 import sys
 import os
-import matplotlib.pyplot as plt
 from constant import *
 
 ##if want to customize some varibles, can enter them in terminal (see Unit Test.txt for example)
@@ -34,17 +24,27 @@ except:
 if not os.path.exists(pathToOutputData[:-1]):
     os.makedirs(pathToOutputData[:-1])
 
-# import raw data
+# import raw data and stimulus file
 data, TotalTime, TotalROIs = Utility.importDataFile(debug, pathToRaw + "Results.csv") #import and format data
+stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols = (0,1,2,3))
 
 #normalize and smooth data
 normalized = Utility.normalize(debug, data, window = window, percentile = polynomial)
 smoothed = Utility.smooth(debug, normalized,window_size,polynomial)
-allThresholds = Utility.getAllThresholds(debug, smoothed, threshold, baselineStart = baselineStart, baselineEnd=baselineEnd)
+
+# if already have smoothed data, and just want to re-run getAllTHreshods, un-comment out the following 2 lines
+# splPATH = pathToOutputData + splPrefix
+# smoothed = np.loadtxt(splPATH +"Smoothed.csv",delimiter=',',dtype=str)
+
+# get threshold for all ROIs and stimuli
+allThresholds = Utility.getAllThresholds(debug, smoothed, stimulus, fps, threshold)
 
 # prefix to save file to the correct directory
 prefix = pathToOutputData + splPrefix
 
+#save everything
+#if already have smoothed data, and just want to re-run getAllthresholds, comment out the 2 lines
+#that save "Normalized.csv" and "Smoothed.csv" 
 np.savetxt(prefix + "Normalized.csv", normalized, delimiter=',', comments='', fmt='%s')
 np.savetxt(prefix + "Smoothed.csv", smoothed, delimiter=',', comments='', fmt='%s')
 np.savetxt(prefix + "AllThresholds.csv", allThresholds, delimiter=',', comments='', fmt='%s')
