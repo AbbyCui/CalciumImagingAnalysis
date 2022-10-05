@@ -3,13 +3,11 @@ Plots user specified exp number, plane, ROI, time frame (in sec), with each stim
 Make sure stimulus names don't include ","
 '''
 
-import Utility_working as Utility #custom-made utility file, contains lengthy functions
+import this
+import Utility_0915_verified as Utility #custom-made utility file, contains lengthy functions
 from constant import *
-from gettext import install
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
-import plotly.express as px
 import matplotlib.pyplot as plt
 import sys
 import os
@@ -73,13 +71,6 @@ for i in range(1,len(ROIs)+1):
     # rawROIdata = ROIdata[1:,i].astype(float, copy=False)
     # rawNormalized = ROInormalized[1:,i].astype(float,copy=False)
     rawSmoothed = ROIsmoothed[1:,i].astype(float,copy=False)
-    try:
-        thisThreshold = AllThresholds[i]
-    except:
-        thisThreshold = 0.5
-    if debug:
-        print("ROI =",ROI)
-        print("i =",i)
 
     fig = plt.figure() 
     ax = fig.add_subplot()
@@ -88,34 +79,33 @@ for i in range(1,len(ROIs)+1):
     plt.xlabel("Time (sec)")
     plt.plot(np.arange(stimStart, stimEnd, step = 1)/fps,rawSmoothed)
     plt.tight_layout()
-
-    #draw a line at y = 0.5 for threshold
-    plt.axhline(y=float(thisThreshold), color='r', linestyle='-')
-
-    if debug:
-        print("plotting with threshold =",thisThreshold)
+    left, right = plt.xlim() 
     
-    #makr each stimulus with shadings
-    for i in range(0,stimulus.shape[0]):
-        stimName = stimulus[i,0]
-        start = int(float(stimulus[i,1]))/fps
-        end = int(float(stimulus[i,2]))/fps
+    #mark each stimulus with shadings and draw threshold for them with red line
+    for j in range(1,stimulus.shape[0]):
+        stimName = stimulus[j,0]
+        thisThreshold = float(AllThresholds[j,i])
+        start = int(float(stimulus[j,1]))/fps
+        end = int(float(stimulus[j,2]))/fps
+        percentStart = (start-left)/(right-left)
+        percentEnd = (end-left)/(right-left)
         #try to find color in Stimulus.csv
         #if fail (not provided), default to grey
         try:
-            color = stimulus[i,3]
+            color = stimulus[j,3]
         except:
             color = "grey"
             if debug:
                 print("no color provided in Stimulus.csv. Color defaulted to grey")
-        stimNum = stimulus.shape[0]
-
         if debug:
-            print("for stimulus:",stimName ,", stimStart =",start,"stimEnd =",end,"color is",color)
+            print("for stimulus:",stimName ,", stimStart =",start,percentStart,"stimEnd =",end,percentEnd,"color is",color,"threshold is",thisThreshold)
+            # print(" ")
+        # if the window plotted include only a part of a stimuli window, still draw the shadings
         if start >= stimStart/fps and end <= stimEnd/fps:
             plt.axvspan(start, end, alpha=0.3, color=color) 
+            plt.axhline (y = thisThreshold, xmin =percentStart, xmax =percentEnd, color='red', linewidth = 1 )
 
-    plt.savefig(pathToFigure + expNumber+"_" + planeNumber + "_ROI" + ROI + "_Frm"+str(stimStart) + "-" + str(stimEnd) + ".png")
+    plt.savefig(pathToFigure + "debug"+expNumber+"_" + planeNumber + "_ROI" + ROI + "_Frm"+str(stimStart) + "-" + str(stimEnd) + ".png")
     plt.grid()
     # plt.show()
     plt.close("all")
