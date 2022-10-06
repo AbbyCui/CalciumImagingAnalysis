@@ -340,6 +340,12 @@ def getAllThresholds(debug,data,stim,fps,threshold = 0.5):
         AllThresholds[i+1,1:] = StimThresholds
         if debug:
             print("stimName",stimName)
+
+    # Temporary fix: make all stimThreshold the same for the same ROI
+    # the ROI's threshold = median of all stimThresholds for this ROI
+    for i in range (0,ys):
+        ROIthreshold = np.median(AllThresholds[1:,i+1])
+        AllThresholds[1:,i+1] = ROIthreshold
     return AllThresholds
     
 def extractEvent(debug,data,stim,AllThresholds):
@@ -369,16 +375,16 @@ def extractEvent(debug,data,stim,AllThresholds):
     for x in range(1,xs): #for each ROI
         event = 0 #initialize event number as 0
         s = 1 # initialize stimlus index as 1
-        for y in range(1,ys):
+        for y in range(1,ys): #for each frame in this ROI
             thisData = float(data[y,x]) #extract raw data and change to float
-            #determine threshold
-            
+            #determine threshold based on which stimuli this current frame is in
             for i in range(s,stimNum):
                 if y >= float(stim[i,1]) and y <= float(stim[i,2]):
                     s = i
                     break
             thisThreshold = float(AllThresholds[s,x])
-            # find events
+
+            # find events 
             if thisData>thisThreshold:
                 spikesInOnes[y,x] = 1
                 # if the prior frame is 0 (smaller than threshold)
@@ -519,7 +525,7 @@ def getMaxResponse (debug,data,stimStart,stimEnd,Starts,Ends):
             start = int(Starts[j,i]) + dataStart
             end = int(Ends[j,i]) + dataStart
             # if this event occured during the stimulation window
-            if start >= int(float(stimStart)) and end <= int(float(stimEnd)):
+            if (start >= int(float(stimStart)) and start<= int(float(stimEnd))) or (end >= int(float(stimStart)) and end <= int(float(stimEnd))):
                 if debug:
                     print("current start and end:",start,end)
                 maxSignal = max(data[start:end+1,i])
