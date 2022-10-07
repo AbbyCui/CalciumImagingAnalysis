@@ -20,7 +20,6 @@ from constant import *
 ##if want to customize some varibles, can enter them in terminal (see Unit Test.txt for example)
 try:
     planeNumber = sys.argv[1]
-
     print("Starting InterspikeInterval with variables from terminal input: planeNumber:",planeNumber)
 
     splPrefix = expNumber + "_" + planeNumber + "_"
@@ -31,19 +30,25 @@ except:
 # if have a csv. file with ROIs to remove, it will be included in plotting
 try:
     AllROIsToRemove = np.loadtxt(pathToData +"BadROIs.csv",delimiter=',',dtype=str)
+    print("found badROIs")
     ROIsToRemove=Utility.getROIsToRemove(debug, AllROIsToRemove, plane = planeNumber)
+    print("ROIsToRemove=",ROIsToRemove)
+    
 except:
     ROIsToRemove = np.zeros((1,1))
-    print("plotting all ROIs")
-
+    print("calculating max response for all ROIs")
+    
 #import smoothed data and stimulus files
 data = np.loadtxt(pathToOutputData + splPrefix +"Smoothed.csv",delimiter=',',dtype=str)
+print("data has dimension:",data.shape)
+
 stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str)
 AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",delimiter=',',dtype=str)
 stimNum = stimulus.shape[0]
 
 #extract only the desired ROIs (extract all frames)
 ROIdata = Utility.extractData(debug, data, ROIs, ROIsToRemove, stimStart = 1, stimEnd = "all") 
+print("ROIdata has shape:",ROIdata.shape)
 Starts,Ends = Utility.extractEvent(debug, ROIdata, stimulus, AllThresholds)
 ROInum = ROIdata.shape[1]-1
 
@@ -64,6 +69,7 @@ for i in range(0,stimulus.shape[0]):
     stimNum = stimulus.shape[0]
     if debug:
         print("for stimulus:",stimName ,", stimStart =",stimStart,"stimEnd =",stimEnd)
+    #get data from all ROI
     thisMaxResponse = Utility.getMaxResponse(debug, ROIdata, stimStart, stimEnd, Starts, Ends)
     maxResponse[i,...] = thisMaxResponse.astype(str)
     if debug:
@@ -93,5 +99,5 @@ responders = np.hstack((Res_StimulusNames[:, None],responders))
 #put responders on the b0ottom of maxResponse
 maxResponse = np.vstack((maxResponse,responders))
 
-
+#save maxResponse
 np.savetxt(pathToOutputData + splPrefix + "MaxResponse.csv", maxResponse, delimiter=',', comments='', fmt='%s')

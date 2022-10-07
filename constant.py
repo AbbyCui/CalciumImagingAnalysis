@@ -21,6 +21,7 @@ fps = 7.4
 stimStart = 1
 #if want the entirety of the recording, input stimEnd = "all"
 #if exceed max frame number, automatically take the 
+# stimEnd = 2000*7.4
 stimEnd = "all"
 
 #start of baseline
@@ -68,6 +69,8 @@ window = 400
 # but can decrease the height of transient peaks. Choose something on the same scale as your events, 
 # e.g. if a transient peak lasts around 30 frames, 15 is a good starting point.
 window_size = 15
+##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. 
+percentile=30 
 #polynomial order for smoothing
 #this is the order of polynomial used for smoothing. 
 # Bigger numbers fit the curve more closely (i.e. less smooth, but more accurate)

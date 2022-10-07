@@ -2,9 +2,7 @@
 Plots user specified exp number, plane, ROI, time frame (in sec), with each stimuli shaded with user specified colors (at the 3rd column of the Stimulus.csv)
 Make sure stimulus names don't include ","
 '''
-
-import this
-import Utility_0915_verified as Utility #custom-made utility file, contains lengthy functions
+import Utility_working as Utility #custom-made utility file, contains lengthy functions
 from constant import *
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,9 +26,13 @@ except:
 # if have a csv. file with ROIs to remove, it will be included in plotting
 try:
     AllROIsToRemove = np.loadtxt(pathToData +"BadROIs.csv",delimiter=',',dtype=str)
+    print("found badROIs")
+    ROIsToRemove=Utility.getROIsToRemove(debug, AllROIsToRemove, plane = planeNumber)
+    print("ROIsToRemove=",ROIsToRemove)
+    
 except:
-    AllROIsToRemove = np.zeros((3, 6))
-    print("plotting all ROIs specified in constant.py")
+    ROIsToRemove = np.zeros((1,1))
+    print("plotting all ROIs")
 
 # if Figure folder do not exist, create one
 if not os.path.exists(pathToFigure[:-1]):
@@ -39,6 +41,7 @@ if not os.path.exists(pathToFigure[:-1]):
 # import raw data, normalized data, and smoothed data
 splPATH = pathToOutputData + splPrefix
 smoothed = np.loadtxt(splPATH +"Smoothed.csv",delimiter=',',dtype=str)
+smoothed = Utility.extractData(debug, smoothed, ROIsToRemove = ROIsToRemove, stimStart = stimStart, stimEnd = stimEnd)
 stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols = (0,1,2,3))
 AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",delimiter=',',dtype=str)
 
@@ -63,13 +66,11 @@ ROIsToRemove=Utility.getROIsToRemove(debug, AllROIsToRemove, plane = planeNumber
 # extract only the wanted ROIs and crop recording to desired time frames
 ROIsmoothed = Utility.extractData(debug, smoothed, ROIs, stimStart = stimStart, stimEnd = stimEnd)
 ROIs = ROIsmoothed[0,1:]
+print("plotting experiment ",expNumber, "plane ",planeNumber,"with ",ROIsmoothed.shape[1]-1,"ROIs")
 
 # range(x,y) -> [x,y), so end has to be len(ROI)+1 to include the last ROI
 for i in range(1,len(ROIs)+1):
     ROI = str(ROIs[i-1])[4:]
-
-    # rawROIdata = ROIdata[1:,i].astype(float, copy=False)
-    # rawNormalized = ROInormalized[1:,i].astype(float,copy=False)
     rawSmoothed = ROIsmoothed[1:,i].astype(float,copy=False)
 
     fig = plt.figure() 
@@ -105,7 +106,7 @@ for i in range(1,len(ROIs)+1):
             plt.axvspan(start, end, alpha=0.3, color=color) 
             plt.axhline (y = thisThreshold, xmin =percentStart, xmax =percentEnd, color='red', linewidth = 1 )
 
-    plt.savefig(pathToFigure + "debug"+expNumber+"_" + planeNumber + "_ROI" + ROI + "_Frm"+str(stimStart) + "-" + str(stimEnd) + ".png")
+    plt.savefig(pathToFigure + "test" +expNumber+"_" + planeNumber + "_ROI" + ROI + "_Frm"+str(stimStart) + "-" + str(stimEnd) + ".png")
     plt.grid()
     # plt.show()
     plt.close("all")

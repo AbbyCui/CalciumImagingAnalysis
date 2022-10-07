@@ -42,7 +42,21 @@ def getROIsToRemove(debug,AllROIsToRemove,plane):
     if debug:
         print("----------getROIsToRemove----------")
         print("shape of AllROIsToRemove is:", AllROIsToRemove.shape)
-    y,x = AllROIsToRemove.shape
+    
+    #define x = number of planes in AllROIsToRemove csv
+    try: # if error out, AllROIsToRemove has 1 colomn 
+        x = np.array(AllROIsToRemove).shape[1]
+    except:
+        x = 1
+
+    if x == 1:
+        ROIsToRemove = []
+        for ROI in AllROIsToRemove[1:]:
+            if ROI != "":
+                ROIsToRemove.append(int(ROI))
+        return ROIsToRemove
+
+    # for each plane in AllROIsToRemove.csv
     for i in range(x):
         if debug:
             print("i=",i)
