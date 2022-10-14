@@ -48,7 +48,8 @@ SecondsPerInch=800
 # ~300 the bare minimum for 15s VF spacing, but tight, ~100 would be better. C
 # CICADA is totally readable at 800
 
-
+#minimum number of frames which meet threshold to be considered a response
+spikeduration=4
 
 
 #__________________Other variables___________________#
