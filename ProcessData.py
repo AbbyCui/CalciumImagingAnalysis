@@ -9,8 +9,8 @@ from constant import *
 
 ##if want to customize some varibles, can enter them in terminal (see Unit Test.txt for example)
 try:
-    parentFolder = sys.argv[1]
-    planeNumber = sys.argv[2]
+    #parentFolder = sys.argv[1]
+    planeNumber = sys.argv[1]
 
     pathToRaw = "../"+parentFolder+"/Data/"+parentFolder+"_"+planeNumber+"_"
     pathToOutputData = "../"+parentFolder+"/"+"OutputData/"
@@ -27,12 +27,15 @@ data, TotalTime, TotalROIs = Utility.importDataFile(debug, pathToRaw + "Results.
 stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols = (0,1,2,3))
 
 #normalize and smooth data
-normalized = Utility.normalize(debug, data, window = window, percentile = percentile)
-smoothed = Utility.smooth(debug, normalized,window_size,polynomial)
+if(ThresholdsOnly==0):
+    normalized = Utility.normalize(debug, data, window = window, percentile = percentile)
+    smoothed = Utility.smooth(debug, normalized,window_size,polynomial)
 
-# if already have smoothed data, and just want to re-run getAllTHreshods, un-comment out the following 2 lines
-splPATH = pathToOutputData + splPrefix
-smoothed = np.loadtxt(splPATH +"Smoothed.csv",delimiter=',',dtype=str)
+# if already have smoothed data, and just want to re-run getAllTHreshods
+if(ThresholdsOnly==1):
+    print("Re-running Threshods, no normalization/smoothing")
+    splPATH = pathToOutputData + splPrefix
+    smoothed = np.loadtxt(splPATH +"Smoothed.csv",delimiter=',',dtype=str)
 
 # get threshold for all ROIs and stimuli
 allThresholds = Utility.getAllThresholds(debug, smoothed, stimulus, fps, threshold)
@@ -41,8 +44,8 @@ allThresholds = Utility.getAllThresholds(debug, smoothed, stimulus, fps, thresho
 prefix = pathToOutputData + splPrefix
 
 #save everything
-#if already have smoothed data, and just want to re-run getAllthresholds, comment out the 2 lines
 #that save "Normalized.csv" and "Smoothed.csv" 
-# np.savetxt(prefix + "Normalized.csv", normalized, delimiter=',', comments='', fmt='%s')
-# np.savetxt(prefix + "Smoothed.csv", smoothed, delimiter=',', comments='', fmt='%s')
-# np.savetxt(prefix + "AllThresholds.csv", allThresholds, delimiter=',', comments='', fmt='%s')
+if(ThresholdsOnly==0):
+    np.savetxt(prefix + "Normalized.csv", normalized, delimiter=',', comments='', fmt='%s')
+    np.savetxt(prefix + "Smoothed.csv", smoothed, delimiter=',', comments='', fmt='%s')
+np.savetxt(prefix + "AllThresholds.csv", allThresholds, delimiter=',', comments='', fmt='%s')
