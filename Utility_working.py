@@ -412,7 +412,6 @@ def extractEvent(debug,data,stim,AllThresholds):
                         start = y
                 # if the prior frame doesn't exist, then this is the first row/frame
                 except:
-                    print()
                     if debug:
                         print("reached the first or the last row")
                 # if this value is smaller than threshold
