@@ -62,8 +62,6 @@ elif int(stimEnd) > TotalTime:
 stimStart = int(stimStart)
 stimEnd = int(stimEnd)
 
-# remove unwanted ROIs, trim to only a time window of interest
-ROIsToRemove=Utility.getROIsToRemove(debug, AllROIsToRemove, plane = planeNumber)
 # extract only the wanted ROIs and crop recording to desired time frames
 ROIsmoothed = Utility.extractData(debug, smoothed, ROIs, stimStart = stimStart, stimEnd = stimEnd)
 ROIs = ROIsmoothed[0,1:]
