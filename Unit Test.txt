@@ -1,61 +1,41 @@
 #run the following in terminal 
 python path/to/pythonFile, path/to/dataFile
-e.g.
-    python ProcessData.py
-    python InterSpikeInterval.py
-    python Plot.py
 
-or
-# takes the most time, but only need to do it once
-    python ProcessData.py "#468" "P0"
-    python ProcessData.py "#468" "P1"
-    python ProcessData.py "#468" "P2"
-    python ProcessData.py "#468" "P3"
-    python ProcessData.py "#468" "P4"
+#462
 
+Run these commands all at once (make sure to include a return at the end)
+    python ProcessData.py "P0"
+    python ProcessData.py "P1"
+    python ProcessData.py "P2"
+    python ProcessData.py "P3"
+    "finished"
 
 # raw screening of bad ROIs, also get a sense of how to analyze
-    
-    python Plot.py "P0" 1 "all" 
+    plot.py P0 5000 10000 (this plots frames 5000 to 10000)
+   Input arguments are: Plot.py ["plane"] [start] [stop] [Seconds per inch]
+
+    python Plot.py "P0" 1 "all"
     python Plot.py "P1" 1 "all"
     python Plot.py "P2" 1 "all"
     python Plot.py "P3" 1 "all"
-    python Plot.py "P4" 1 "all"
-    
-    python Plot.py "P0" 52000 58000 
-    python Plot.py "P1" 52000 58000
-    python Plot.py "P2" 52000 58000
-    python Plot.py "P3" 52000 58000
-    python Plot.py "P4" 52000 58000
+    "finished"
 
-    python Plot.py "P0" 14000 28000 
-    python Plot.py "P1" 14000 28000
-    python Plot.py "P2" 14000 28000
-    python Plot.py "P3" 14000 28000
-    python Plot.py "P4" 14000 28000 
+    secondsperinch (100-800 are good numbers) otherwise it defaults to 800 or what's in the constant file
 
 
 # manually remove ROIs with too much z-drift, or dead ones
 # (put ROI number of the bad ROIs in an excel sheet, with "P0", 
 # "P1" etc as first row, then ROI numbers in the corresponding columns)
 
-    python InterSpikeInterval.py "P0" 2100 40000
-    python InterSpikeInterval.py "P1" 2100 40000
-    python InterSpikeInterval.py "P2" 2100 40000
-    python InterSpikeInterval.py "P3" 2100 40000
-    python InterSpikeInterval.py "P4" 2100 40000
-    python InterSpikeInterval.py "P5" 2100 40000
+    python MaxResponse.py "P0"
+    python MaxResponse.py "P1"
+    python MaxResponse.py "P2"
+    python MaxResponse.py "P3"
+    "finished"
 
     python MaxResponse.py "P0"
     python MaxResponse.py "P1"
     python MaxResponse.py "P2"
     python MaxResponse.py "P3"
-    python MaxResponse.py "P4"
-    python MaxResponse.py "P5"
-
-    python ProcessData.py "#2" "P0"
-    python ProcessData.py "#2" "P1"
-    python ProcessData.py "#2" "P2"
-    python Plot.py "P0" 1 "all" 
-    python Plot.py "P1" 1 "all"
-    python Plot.py "P2" 1 "all"
+    python StitchFiles.py "#462" "MaxResponse"
+    "finished"
