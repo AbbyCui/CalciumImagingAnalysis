@@ -15,7 +15,6 @@ try:
     planeNumber = sys.argv[1]
     stimStart = sys.argv[2]
     stimEnd = sys.argv[3]
-    SecondsPerInch = sys.argv[4]
     print(planeNumber,stimStart,stimEnd)
     splPrefix = expNumber + "_" + planeNumber + "_"
     prefix = expNumber + "_" + planeNumber+ " _frm" + str(stimStart) + "-"+ str(stimEnd)+ "_" 
@@ -62,6 +61,8 @@ elif int(stimEnd) > TotalTime:
 stimStart = int(stimStart)
 stimEnd = int(stimEnd)
 
+# remove unwanted ROIs, trim to only a time window of interest
+ROIsToRemove=Utility.getROIsToRemove(debug, AllROIsToRemove, plane = planeNumber)
 # extract only the wanted ROIs and crop recording to desired time frames
 ROIsmoothed = Utility.extractData(debug, smoothed, ROIs, stimStart = stimStart, stimEnd = stimEnd)
 ROIs = ROIsmoothed[0,1:]
@@ -74,53 +75,26 @@ for i in range(1,len(ROIs)+1):
 
     fig = plt.figure() 
     ax = fig.add_subplot()
-    leftxaxis=((round(stimStart/fps/10))*10)
-    leftxaxis=int(leftxaxis)
-    rightxaxis=(round(((stimEnd)/fps/10)*10))
-    rightxaxis=int(rightxaxis)
-    xaxisrange=(rightxaxis-leftxaxis)##this is the duration in seconds of the total recording
-    SecondsPerInch=int(SecondsPerInch)
-    xaxisrange=int(xaxisrange)
-    figsize=(xaxisrange/SecondsPerInch)
-    figsize=int(figsize)
-    if(figsize<1):
-        figsize=1
-        print("X-axis too small, increase range or the seconds/inch")
-    fig.set_size_inches(figsize, 5)
-    plt.title(expNumber + " "+planeNumber +" ROI=" + ROI, loc='center', y=.9)
+    fig.set_size_inches(25, 3)
+    plt.title(expNumber + " "+planeNumber +" ROI=" + ROI)
     plt.xlabel("Time (sec)")
-    plt.plot(np.arange(stimStart, stimEnd, step = 1)/fps,rawSmoothed,linewidth=1)
+    plt.plot(np.arange(stimStart, stimEnd, step = 1)/fps,rawSmoothed)
     plt.tight_layout()
-    plt.axis()
-    yaxismax=3
-    plt.ylim(-.2, yaxismax)
-    plt.xlim(leftxaxis, rightxaxis)
     left, right = plt.xlim() 
-    plt.subplots_adjust(left=None, bottom=None, right=None, top=.7, wspace=None, hspace=None)
-    tickspacing=500 #this is in seconds
-    Ticks=1
-    if(Ticks==1):
-        xmarks=[i for i in range(leftxaxis,rightxaxis,tickspacing)]
-        plt.xticks(xmarks)
-        #minor tick spacing
-        minortickspacing=.1 #this is in fractions of major
-        tickspacing=tickspacing*minortickspacing
-        tickspacing=int(tickspacing)
-        xmarks=[i for i in range(leftxaxis,rightxaxis,tickspacing)]
-        plt.xticks(xmarks,minor=True)
     
     #mark each stimulus with shadings and draw threshold for them with red line
     for j in range(1,stimulus.shape[0]):
-        stimName = stimulus[j,0]
+        stimName = stimulus[j-1,0]
+        print(stimName)
         thisThreshold = float(AllThresholds[j,i])
-        start = int(float(stimulus[j,1]))/fps
-        end = int(float(stimulus[j,2]))/fps
+        start = int(float(stimulus[j-1,1]))/fps
+        end = int(float(stimulus[j-1,2]))/fps
         percentStart = (start-left)/(right-left)
         percentEnd = (end-left)/(right-left)
         #try to find color in Stimulus.csv
         #if fail (not provided), default to grey
         try:
-            color = stimulus[j,3]
+            color = stimulus[j-1,3]
         except:
             color = "grey"
             if debug:
@@ -132,9 +106,8 @@ for i in range(1,len(ROIs)+1):
         if start >= stimStart/fps and end <= stimEnd/fps:
             plt.axvspan(start, end, alpha=0.3, color=color) 
             plt.axhline (y = thisThreshold, xmin =percentStart, xmax =percentEnd, color='red', linewidth = 1 )
-            plt.text(start, (yaxismax), stimName, rotation=-45, fontsize=12, wrap=False, ha='right')
 
-    plt.savefig(pathToFigure + expNumber+"_" + planeNumber + "_ROI" + ROI + "_"+str(stimStart) + "-" + str(stimEnd) + ".png")
+    plt.savefig(pathToFigure + "ttt" +expNumber+"_" + planeNumber + "_ROI" + ROI + "_Frm"+str(stimStart) + "-" + str(stimEnd) + ".png")
     plt.grid()
     # plt.show()
     plt.close("all")
