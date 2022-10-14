@@ -88,6 +88,8 @@ def extractData (debug, data, ROIs = "all", ROIsToRemove = [], stimStart = 0, st
     if str(stimEnd) == "all":
         stimEnd = y-1
     ##ROIdata contains signals for the designated ROI(s)
+    stimStart=int(stimStart)
+    stimEnd=int(stimEnd)
     ROIsdata = data[stimStart:stimEnd,0] #timepoints
     ROInames = ["Frame",] #initiate new empty array
     #this for loop produces data with the wrong axis (one row for each ROI and one column for each time point)
@@ -296,7 +298,7 @@ def getBaselineMean(debug,data,baselineStart = 1,baselineEnd = 240):
 
     return baselineMean
 
-def getStimThresholds(debug,data,baselineStart,baselineEnd,threshold = 0.5):
+def getStimThresholds(debug,data,baselineStart,baselineEnd,threshold):
     '''
     get the threshold for each ROI for a given stimulus window
     input: smoothed data, the threshold, the start and end of baseline recording (in frames)
@@ -316,17 +318,17 @@ def getStimThresholds(debug,data,baselineStart,baselineEnd,threshold = 0.5):
     for i in range(1,x):
         thisBaselineSD = baselineSD[i-1]
         thisBaselineMean = baselineMean[i-1]
-        if threshold > thisBaselineMean + 4*thisBaselineSD:
+        if threshold > thisBaselineMean + constant.SD*thisBaselineSD:
             thisThreshold =threshold
             StimThresholds[0,i-1]=thisThreshold
         else:
-            thisThreshold = thisBaselineMean + 4*thisBaselineSD
+            thisThreshold = thisBaselineMean + constant.SD*thisBaselineSD
             StimThresholds[0,i-1]=thisThreshold
         if debug:
             print("This threshold is:",thisThreshold)
     return StimThresholds
 
-def getAllThresholds(debug,data,stim,fps,threshold = 0.5):
+def getAllThresholds(debug,data,stim,fps,threshold):
     '''
     Get the threshold for each ROI
     Threshold is 0.5 or mean + 4*SD, whichever is larger
@@ -357,12 +359,12 @@ def getAllThresholds(debug,data,stim,fps,threshold = 0.5):
 
     # Temporary fix: make all stimThreshold the same for the same ROI
     # the ROI's threshold = median of all stimThresholds for this ROI
-    if constant.varyingThreshold:
+    if constant.varyingThreshold==False:
         for i in range (0,ys):
             ROIthreshold = np.median(AllThresholds[1:,i+1])
             AllThresholds[1:,i+1] = ROIthreshold
             if debug:
-                print("varying threshold = true")
+                print("varying threshold = False")
     return AllThresholds
     
 def extractEvent(debug,data,stim,AllThresholds):
@@ -417,8 +419,8 @@ def extractEvent(debug,data,stim,AllThresholds):
                 try:
                     if float(data[y+1,x]) < thisThreshold: 
                         end = y
-                        #if spike lasted for more than 4 frames, count as an event
-                        if end-start >= 4:
+                        #if spike lasted for more than 4 [ or the variable spikeduration] (variable name) frames, count as an event
+                        if end-start >= constant.spikeduration:
                         #after a spike ends, add start and finish to startsAndEnds as a tuple
                             event += 1
                             Starts[event,x] = start
