@@ -90,5 +90,3 @@ For my reference, 400 seconds per inch with a 1 point weight lines is the minimu
 ```
 python Plot.py "P0" 1 "all"
 ```
-
-## don't use the other scripts until my calculation for threshold is updated to be specific to each stimuli!  
