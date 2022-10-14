@@ -7,7 +7,9 @@ import numpy as np
 ##################################### BELOW ARE THE MOST IMPORTANT VARIABLES TO MODIFY#####################
 
 #set debug to True to show all debugging statements, and set to False to hide all (also saves time)
-debug = False
+debug = True
+#set varyingThreshold to have different threshold for each stimuli for each ROI (e.g. 3 ROI x 5 stimuli = 15 different thresholdds)
+varyingThreshold = True
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
 # and Figure(output figures)
 parentFolder = "#468"

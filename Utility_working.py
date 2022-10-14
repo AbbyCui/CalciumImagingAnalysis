@@ -61,11 +61,11 @@ def getROIsToRemove(debug,AllROIsToRemove,plane):
         if debug:
             print("i=",i)
             print("this column has:",AllROIsToRemove[...,i])
-        if AllROIsToRemove[0,i] == plane:
+        if str(AllROIsToRemove[0,i]) == str(plane):
             ROIsToRemove = []
             for ROI in AllROIsToRemove[1:,i]:
                 if ROI != "":
-                    np.append(ROIsToRemove,int(ROI))
+                    ROIsToRemove.append(int(ROI))
             if debug:
                 print("ROIsToRemove =:",ROIsToRemove)
                 print("type is:",type(ROIsToRemove))
@@ -261,7 +261,7 @@ def getBaselineSD(debug,data,baselineStart = 1,baselineEnd = 240):
     if debug:
         print("----------getBaselineSD----------")
 
-    data = extractData(debug, data, ROIs = constant.ROIs, stimStart = baselineStart, stimEnd = baselineEnd)
+    data = extractData(debug, data, ROIs = "all", stimStart = baselineStart, stimEnd = baselineEnd)
     y,x = data.shape
     baselineSD = np.zeros((x-1,1), dtype=float, order='C')
     for i in range(1,x):
@@ -283,7 +283,7 @@ def getBaselineMean(debug,data,baselineStart = 1,baselineEnd = 240):
         print("----------getBaselineMean----------")
         print("baseline start=",baselineStart, "end =",baselineEnd)
 
-    data = extractData(debug, data, ROIs = constant.ROIs, stimStart = baselineStart, stimEnd = baselineEnd)
+    data = extractData(debug, data, ROIs = "all", stimStart = baselineStart, stimEnd = baselineEnd)
     y,x = data.shape
     baselineMean = np.zeros((x-1,1), dtype=float, order='C')
     for i in range(1,x):
@@ -357,9 +357,12 @@ def getAllThresholds(debug,data,stim,fps,threshold = 0.5):
 
     # Temporary fix: make all stimThreshold the same for the same ROI
     # the ROI's threshold = median of all stimThresholds for this ROI
-    for i in range (0,ys):
-        ROIthreshold = np.median(AllThresholds[1:,i+1])
-        AllThresholds[1:,i+1] = ROIthreshold
+    if constant.varyingThreshold:
+        for i in range (0,ys):
+            ROIthreshold = np.median(AllThresholds[1:,i+1])
+            AllThresholds[1:,i+1] = ROIthreshold
+            if debug:
+                print("varying threshold = true")
     return AllThresholds
     
 def extractEvent(debug,data,stim,AllThresholds):

@@ -106,7 +106,7 @@ for i in range(1,len(ROIs)+1):
             plt.axvspan(start, end, alpha=0.3, color=color) 
             plt.axhline (y = thisThreshold, xmin =percentStart, xmax =percentEnd, color='red', linewidth = 1 )
 
-    plt.savefig(pathToFigure + "test" +expNumber+"_" + planeNumber + "_ROI" + ROI + "_Frm"+str(stimStart) + "-" + str(stimEnd) + ".png")
+    plt.savefig(pathToFigure + "ttt" +expNumber+"_" + planeNumber + "_ROI" + ROI + "_Frm"+str(stimStart) + "-" + str(stimEnd) + ".png")
     plt.grid()
     # plt.show()
     plt.close("all")
