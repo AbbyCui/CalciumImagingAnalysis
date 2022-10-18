@@ -11,13 +11,13 @@ Run these commands all at once (make sure to include a return at the end)
     "finished"
 
 # raw screening of bad ROIs, also get a sense of how to analyze
-    plot.py P0 5000 10000 (this plots frames 5000 to 10000)
+    plot.py P0 5000 10000 800 (this plots frames 5000 to 10000, with 800 second per inch of figure)
    Input arguments are: Plot.py ["plane"] [start] [stop] [Seconds per inch]
 
-    python Plot.py "P0" 1 "all"
-    python Plot.py "P1" 1 "all"
-    python Plot.py "P2" 1 "all"
-    python Plot.py "P3" 1 "all"
+    python Plot.py "P0" 1 "all" 800
+    python Plot.py "P1" 1 "all" 800
+    python Plot.py "P2" 1 "all" 800
+    python Plot.py "P3" 1 "all" 800
     "finished"
 
     secondsperinch (100-800 are good numbers) otherwise it defaults to 800 or what's in the constant file
