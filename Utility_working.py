@@ -602,3 +602,70 @@ def getSpikePattern (debug,data,AllThresholds,Starts,binSize):
         SpikePattern[1:,0] = rowNames
         SpikePattern[0,1:] = ROInames
     return SpikePattern
+
+def getMaxResponseAll (debug,data,stimStart,stimEnd,Starts,Ends):
+    '''
+    Get the max response of each ROIs for ONE stimulus with defined start and end
+    Input: smoothed data, int for the start and the end of the stimulus,
+        and Starts and Ends dataframe with the starting and ending frames for each event
+    Output: maxResposne dataframe with 1 row, and the same number of columns the number of ROIs (no header)
+    '''
+    if debug:
+        print("----------getMaxResponse function----------")
+    #get dimension of data
+    y,x = data.shape
+    #initialize maxResponse with 2 rows, and the same number of columns as data
+    MaxResponseAll = np.zeros((1,x-1))
+    # for each ROI
+    c=1
+    while c<(x):
+        yrange=y-1
+        temp = data[1:y,c]
+        if(debug==1):
+            print(temp[0])
+            print(temp.shape)
+            print(type(temp))
+        stimwindow=temp[stimStart:stimEnd]
+        stimwindow=stimwindow.astype(float)  
+        tempmax=np.max(stimwindow)
+        if(debug==1):
+            print(tempmax)
+            print(tempmax.shape)
+            print(type(tempmax))
+        MaxResponseAll[0,(c-1)]=tempmax
+        c+=1
+    return MaxResponseAll
+
+def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
+    '''
+    Get the AUC  of each ROIs for ONE stimulus with defined start and end
+    Input: smoothed data, int for the start and the end of the stimulus,
+        and Starts and Ends dataframe with the starting and ending frames for each event
+    Output: AUC dataframe with 1 row, and the same number of columns the number of ROIs (no header)
+    '''
+    if debug:
+        print("----------getAUC function----------")
+    #get dimension of data
+    y,x = data.shape
+    #initialize maxResponse with 2 rows, and the same number of columns as data
+    AUC = np.zeros((1,x-1))
+    # for each ROI
+
+    c=1
+    arrayx=np.zeros(y)
+    while c<(x):
+        yrange=y-1
+        temp = data[1:y,c]
+        if(debug==1):
+            print(temp[0])
+            print(temp.shape)
+            print(type(temp))
+        stimwindow=temp[stimStart:stimEnd]
+        stimwindow=stimwindow.astype(float)
+        AUCtemp=0
+        for frames in stimwindow:
+            if (frames>constant.AUC_threshold):
+                AUCtemp=AUCtemp+frames
+        AUC[0,(c-1)]=AUCtemp
+        c+=1
+    return AUC
