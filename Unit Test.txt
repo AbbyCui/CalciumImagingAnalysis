@@ -1,8 +1,6 @@
 #run the following in terminal 
 python path/to/pythonFile, path/to/dataFile
 
-#462
-
 Run these commands all at once (make sure to include a return at the end)
     python ProcessData.py "P0"
     python ProcessData.py "P1"
