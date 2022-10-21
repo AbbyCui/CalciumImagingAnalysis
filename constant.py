@@ -14,9 +14,14 @@ varyingThreshold = True ##set to True to skip median determination of thresholds
 threshold = 0.4
 ##Threshold for SD 
 SD=5
-
+##Output a third sheet which contains the max amp of all stims regardless of threshold (mostly for finding/validating thresholds)
+MaxAll=True
 ##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
 ThresholdsOnly=0
+
+##Simple AUC calculations. This is just a simple sum of the thresholded frames within a stim window
+DO_AUC=True
+AUC_threshold=0.4
 
 
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
