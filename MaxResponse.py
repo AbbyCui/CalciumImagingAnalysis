@@ -76,6 +76,51 @@ for i in range(0,stimulus.shape[0]):
         print("shape of thisMaxResponse is",thisMaxResponse.shape)
         print("thisMaxResponse:",thisMaxResponse.astype(str))
 
+#initialize MaxResponseAll with the same number of rows as stimulus, 
+# but the number of columns as number of ROI
+if(MaxAll==True):
+    MaxResponseAll = np.zeros((stimNum,ROInum))
+    ROInames = ROIdata[0,...] #including [0,0]
+    StimulusNames = stimulus[...,0]
+    if debug:
+        print("maxResponse initially:",maxResponse)
+        print("ROinames =",ROInames,"StimulusNames =",StimulusNames)
+
+    # for each stimulus (each row), get maxResponse of each ROI
+    for i in range(0,stimulus.shape[0]):
+        stimName = stimulus[i,0]
+        stimStart = int(float(stimulus[i,1]))
+        stimEnd = int(float(stimulus[i,2]))
+        stimNum = stimulus.shape[0]
+        if debug:
+            print("for stimulus:",stimName ,", stimStart =",stimStart,"stimEnd =",stimEnd)
+        #get data from all ROI
+        thisMaxResponse = Utility.getMaxResponseAll(debug, ROIdata, stimStart, stimEnd, Starts, Ends)##DO THE THING AND ASSIGN THE number to a variable
+        MaxResponseAll[i,...] = thisMaxResponse.astype(str) ##append the number to the appropriate column
+        if debug:
+            print("shape of thisMaxResponse is",thisMaxResponse.shape)
+            print("thisMaxResponse:",thisMaxResponse.astype(str))
+
+
+#initialize AUC with the same number of rows as stimulus, 
+# but the number of columns as number of ROI
+if(DO_AUC==True):
+    AUC = np.zeros((stimNum,ROInum))
+    ROInames = ROIdata[0,...] #including [0,0]
+    StimulusNames = stimulus[...,0]
+    # for each stimulus (each row), get maxResponse of each ROI
+    for i in range(0,stimulus.shape[0]):
+        stimName = stimulus[i,0]
+        stimStart = int(float(stimulus[i,1]))
+        stimEnd = int(float(stimulus[i,2]))
+        stimNum = stimulus.shape[0]
+        if debug:
+            print("for stimulus:",stimName ,", stimStart =",stimStart,"stimEnd =",stimEnd)
+        #get data from all ROI
+        thisAUC = Utility.getAUC(debug, ROIdata, stimStart, stimEnd, Starts, Ends)##DO THE THING AND ASSIGN THE number to a variable
+        AUC[i,...] = thisAUC.astype(str) ##append the number to the appropriate column
+
+
 #duplicate maxResponse, then change all values >0 to 1 to indicate responder
 responders = np.copy(maxResponse)
 responders[responders > 0] = 1 
@@ -89,15 +134,34 @@ if debug:
     print("shape of ROInames:",ROInames.shape,"shape of maxResponse:",maxResponse)
 maxResponse = np.vstack((ROInames[None,:],maxResponse))
 
+# add back the ROI names and stimulus names to maxResponseAll
+Amp_StimulusNames = np.array(["Amp_"]*len(MaxResponseAll))
+Amp_StimulusNames = np.core.defchararray.add(Amp_StimulusNames, StimulusNames)
+MaxResponseAll = np.hstack((Amp_StimulusNames[:, None],MaxResponseAll))
+
+# add back the stimulus names to AUC
+AUC_StimulusNames = np.array(["AUC_"]*len(StimulusNames))
+AUC_StimulusNames = np.core.defchararray.add(AUC_StimulusNames, StimulusNames)
+AUC = np.hstack((AUC_StimulusNames[:, None],AUC))
+
 #make headers for responders for each stimulus (e.g. "Res_3nM GRP")
-Res_StimulusNames = np.array(["Res_"]*len(StimulusNames))
+Res_StimulusNames = np.array(["Binary_"]*len(StimulusNames))
 Res_StimulusNames = np.core.defchararray.add(Res_StimulusNames, StimulusNames)
 if debug:
     print("Res_StimulusNames =",Res_StimulusNames)
 #add stim names 
 responders = np.hstack((Res_StimulusNames[:, None],responders))
-#put responders on the b0ottom of maxResponse
-maxResponse = np.vstack((maxResponse,responders))
+
+if(MaxAll==True):
+    #stack all 3 values
+    if(DO_AUC==True):
+        maxResponse = np.vstack((maxResponse,responders,MaxResponseAll,AUC))
+    else: maxResponse = np.vstack((maxResponse,responders,MaxResponseAll))
+else:
+    #put responders on the b0ottom of maxResponse
+    if(DO_AUC==True):
+        maxResponse = np.vstack((maxResponse,responders,MaxResponseAll,AUC))
+    else:maxResponse = np.vstack((maxResponse,responders))
 
 #save maxResponse
 np.savetxt(pathToOutputData + splPrefix + "MaxResponse.csv", maxResponse, delimiter=',', comments='', fmt='%s')
