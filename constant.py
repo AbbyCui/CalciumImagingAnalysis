@@ -22,6 +22,7 @@ ThresholdsOnly=0
 ##Simple AUC calculations. This is just a simple sum of the thresholded frames within a stim window
 DO_AUC=True
 AUC_threshold=0.4
+AUC_norm=true ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
 
 
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
