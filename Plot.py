@@ -15,7 +15,6 @@ try:
     planeNumber = sys.argv[1]
     stimStart = sys.argv[2]
     stimEnd = sys.argv[3]
-    SecondsPerInch = sys.argv[4]
     print(planeNumber,stimStart,stimEnd)
     splPrefix = expNumber + "_" + planeNumber + "_"
     prefix = expNumber + "_" + planeNumber+ " _frm" + str(stimStart) + "-"+ str(stimEnd)+ "_" 
