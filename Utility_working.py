@@ -662,10 +662,13 @@ def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
             print(type(temp))
         stimwindow=temp[stimStart:stimEnd]
         stimwindow=stimwindow.astype(float)
+        duration=(((len(stimwindow))/constant.fps)/60)
         AUCtemp=0
         for frames in stimwindow:
             if (frames>constant.AUC_threshold):
                 AUCtemp=AUCtemp+frames
-        AUC[0,(c-1)]=AUCtemp
+        if(constant.AUC_norm==True):
+            AUC[0,(c-1)]=(AUCtemp/duration)
+        else: AUC[0,(c-1)]=AUCtemp
         c+=1
     return AUC
