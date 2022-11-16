@@ -1,5 +1,6 @@
 """
-This python file include all constants. Change them here, and the changes will apply to all python file that you run afterwards
+This python file include all constants. Change them here, and the changes will apply to all python files
+ that you run afterwards
 """
 from scipy import signal
 import numpy as np
@@ -11,30 +12,24 @@ debug = False
 #set varyingThreshold to have different threshold for each stimuli for each ROI (e.g. 3 ROI x 5 stimuli = 15 different thresholdds)
 varyingThreshold = True ##set to True to skip median determination of thresholds
 # signal above threshold are considered an event
-threshold = 0.4
+threshold = 0.5
 ##Threshold for SD 
-SD=5
-##Output a third sheet which contains the max amp of all stims regardless of threshold (mostly for finding/validating thresholds)
-MaxAll=True
+SD=4
+
 ##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
 ThresholdsOnly=0
 
-##Simple AUC calculations. This is just a simple sum of the thresholded frames within a stim window
-DO_AUC=True
-AUC_threshold=0.4
-AUC_norm=True ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
-
 
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
-parentFolder = "#462"
+parentFolder = "#468"
 
 #Frame per second for the experiment (used only in Plot.py)
-fps = 8.46
+fps = 4.55
 # sample spacing
 T = 1.0 / fps # 8Hz
 
 #window for normalization
-window = 2500 
+window = 400 
 #percentile of window for normalization
 percentile=30 ##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. 
 
@@ -42,7 +37,7 @@ percentile=30 ##depending on how active your cells are, anything from the 5th to
 # this is the window in which the polynomial fits. Larger numbers are more smooth, 
 # but can decrease the height of transient peaks. Choose something on the same scale as your events, 
 # e.g. if a transient peak lasts around 30 frames, 15 is a good starting point.
-window_size = 9
+window_size = 15
 #polynomial order for smoothing
 #this is the order of polynomial used for smoothing. 
 # Bigger numbers fit the curve more closely (i.e. less smooth, but more accurate)
@@ -56,7 +51,6 @@ SecondsPerInch=800
 
 #minimum number of frames which meet threshold to be considered a response
 spikeduration=4
-
 
 #__________________Other variables___________________#
 
@@ -73,13 +67,13 @@ stimStart = 1
 stimEnd = "all"
 
 #start of baseline
-baselineStart = 13500
+baselineStart = 1
 
 #end of baseline (used to measure noise)
-baselineEnd = 13900
+baselineEnd = 2000
 
 #ROIs of interest if say np.arrange (1,3), then will only include ROI 1 and 2
-# ROIs = np.array([52,53])
+# ROIs = np.array([69,70])
 ROIs = 'all'
 
 ######### for SpikePattern.py ###########
@@ -107,7 +101,6 @@ prefix = expNumber + "_" + planeNumber+ " _frm" + str(stimStart) + "-"+ str(stim
 
 #the prefix excluding frame number
 splPrefix = expNumber + "_" + planeNumber+ "_"
-
 
 #Design a digital low-pass filter at 4Hz to remove frequencies faster than 4Hz
 sos = signal.butter(N = 10,Wn = 4, btype = 'lowpass', fs=8.2, output='sos') 

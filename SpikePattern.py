@@ -1,5 +1,6 @@
 """
-calculate AUC (above threshold) for a given stimulus for all ROIs. Also generate a distribution of events for each stimuli (AUC-time), 
+calculate AUC (above threshold) for a given stimulus for all ROIs. 
+Also generate a distribution of events for each stimuli (AUC-time), 
 and calculate kurtosis, skewness and the median from the distribution
 INPUT: smoothed data, stimulus.csv
 OUTPUT: a dataframe with 5 rows (header AUC, kurtosis, skewness and median) and each ROI in each column.
@@ -16,6 +17,7 @@ try:
 
     pathToOutputData = "../"+parentFolder+"/"+"OutputData/"
     splPrefix = expNumber + "_" + planeNumber+ "_"
+    print("Starting SpikePattern.py with variables input from the terminal.")
 except:
     print("Starting ProcessData.py with constants in constant.py")
 
@@ -33,7 +35,7 @@ end = int(float(stimulus[stimIndex,2]))
 
 #extract only the desired ROIs (extract only frames during the desired stimulus window)
 ROIstimdata = Utility.extractData(debug, data, stimStart = start, stimEnd = end) 
-Starts,Ends = Utility.extractEvent(debug, ROIstimdata, AllThresholds)
+Starts,Ends = Utility.extractEvent(debug, ROIstimdata,stimulus ,AllThresholds)
 
 #print some info about input/output
 print("Summarizing spike pattern for",pathToOutputData + splPrefix +"Smoothed.csv")

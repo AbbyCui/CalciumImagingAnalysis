@@ -1,6 +1,8 @@
 #run the following in terminal 
 python path/to/pythonFile, path/to/dataFile
 
+#462
+
 Run these commands all at once (make sure to include a return at the end)
     python ProcessData.py "P0"
     python ProcessData.py "P1"
@@ -9,22 +11,21 @@ Run these commands all at once (make sure to include a return at the end)
     "finished"
 
 # raw screening of bad ROIs, also get a sense of how to analyze
-    plot.py P0 5000 10000  (this plots frames 5000 to 10000)
-   Input arguments are: Plot.py ["plane"] [start] [stop]
+    plot.py P0 5000 10000 800 (this plots frames 5000 to 10000, with 800 second per inch of figure)
+   Input arguments are: Plot.py ["plane"] [start] [stop] [Seconds per inch]
 
-    python Plot.py "P0" 1 "all"
-    python Plot.py "P1" 1 "all"
-    python Plot.py "P2" 1 "all"
-    python Plot.py "P3" 1 "all"
+    python Plot.py "P0" 1 "all" 200
+    python Plot.py "P1" 1 "all" 200
+    python Plot.py "P2" 1 "all" 200
+    python Plot.py "P3" 1 "all" 200
     "finished"
 
-    secondsperinch (100-800 are good numbers). Default is 800, but you can change it in the constant file if desired
+    secondsperinch (100-800 are good numbers) otherwise it defaults to 800 or what's in the constant file
 
 
 # manually remove ROIs with too much z-drift, or dead ones
 # (put ROI number of the bad ROIs in an excel sheet, with "P0", 
 # "P1" etc as first row, then ROI numbers in the corresponding columns)
-# this function can also do AUC now, check the constant file enable or disable features
 
     python MaxResponse.py "P0"
     python MaxResponse.py "P1"
@@ -36,5 +37,20 @@ Run these commands all at once (make sure to include a return at the end)
     python MaxResponse.py "P1"
     python MaxResponse.py "P2"
     python MaxResponse.py "P3"
-    python StitchFiles.py "#462" "MaxResponse"
+    python StitchFiles.py "#6" "MaxResponse"
     "finished"
+
+# quantify SpikePattern.py to identify the AUC, sd and median of spike time of all ROIs for 
+# one single given stimuli window
+# if you're interested in stimuli #19, then input 1 as the last argument
+# currently, the experiment number input from terminal must match that in constant.py
+
+    python SpikePattern.py "#468" "P0" 19
+    python SpikePattern.py "#468" "P1" 19
+    python SpikePattern.py "#468" "P2" 19
+    python SpikePattern.py "#468" "P3" 19
+    python SpikePattern.py "#468" "P4" 19
+    python StitchFiles.py "#468" "SpikePattern"
+    "finished"
+
+# some free area for you to organize and copy-paste your pipeline
