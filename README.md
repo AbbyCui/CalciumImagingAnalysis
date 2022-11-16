@@ -109,7 +109,7 @@ You can run this script from termina by inputting:
 ```
 python MaxResponse.py "P0"
 ```
-
+ 
 The first half of the output csv file will be like this, where each cell indicates the max amplitude for responders, and is 0 for non-responders
 
 ![image](https://user-images.githubusercontent.com/109237711/196473537-904b7e97-6420-48a4-9404-bf4f7b5d1328.png)
