@@ -21,6 +21,17 @@ try:
 except:
     print("Starting ProcessData.py with constants in constant.py")
 
+# if have a csv. file with ROIs to remove, it will be included in plotting
+try:
+    AllROIsToRemove = np.loadtxt(pathToData +"BadROIs.csv",delimiter=',',dtype=str)
+    print("found badROIs")
+    ROIsToRemove=Utility.getROIsToRemove(debug, AllROIsToRemove, plane = planeNumber)
+    print("ROIsToRemove=",ROIsToRemove)
+    
+except:
+    ROIsToRemove = np.zeros((1,1))
+    print("calculating max response for all ROIs")
+
 #import files
 data = np.loadtxt(pathToOutputData + splPrefix +"Smoothed.csv",delimiter=',',dtype=str)
 AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",delimiter=',',dtype=str)
@@ -34,7 +45,7 @@ start = int(float(stimulus[stimIndex,1]))
 end = int(float(stimulus[stimIndex,2]))
 
 #extract only the desired ROIs (extract only frames during the desired stimulus window)
-ROIstimdata = Utility.extractData(debug, data, stimStart = start, stimEnd = end) 
+ROIstimdata = Utility.extractData(debug, data, ROIs="all", ROIsToRemove=ROIsToRemove, stimStart = start, stimEnd = end) 
 Starts,Ends = Utility.extractEvent(debug, ROIstimdata,stimulus ,AllThresholds)
 
 #print some info about input/output
