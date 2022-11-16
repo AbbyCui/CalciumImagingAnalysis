@@ -42,7 +42,7 @@ if correct == 'y' or correct == "Y":
         #import file, and change column names to PlaneNumber_Mean+ROInumber (e.g. P2_Mean1)
         file = np.loadtxt(str(path+f),delimiter=',',dtype=str)
         for i in range(len(file[0,1:])):
-            file[0,i+1] = planeNum+"_"+file[0,i+1]
+            file[0,i+1] = parentFolder + "_" + planeNum+"_"+file[0,i+1]
         #first file
         if counter == 1:
             output = file
