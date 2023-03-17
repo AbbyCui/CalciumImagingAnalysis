@@ -85,7 +85,7 @@ for i in range(1,len(ROIs)+1):
     if(figsize<1):
         figsize=1
         print("X-axis too small, increase range or the seconds/inch")
-    fig.set_size_inches(figsize, 5)
+    fig.set_size_inches(figsize, 7)
     plt.title(expNumber + " "+planeNumber +" ROI=" + ROI, loc='center', y=.9)
     plt.xlabel("Time (sec)")
     plt.plot(np.arange(stimStart, stimEnd, step = 1)/fps,rawSmoothed,linewidth=1)
@@ -133,7 +133,7 @@ for i in range(1,len(ROIs)+1):
             plt.axhline (y = thisThreshold, xmin =percentStart, xmax =percentEnd, color='red', linewidth = 1 )
             plt.text(start, (yaxismax), stimName, rotation=-45, fontsize=12, wrap=False, ha='right')
 
-    plt.savefig(pathToFigure + expNumber+"_" + planeNumber + "_ROI" + ROI + "_"+str(stimStart) + "-" + str(stimEnd) + ".png")
+    plt.savefig(pathToFigure + expNumber+"_" + planeNumber + "_ROI" + ROI + "_"+str(stimStart) + "-" + str(stimEnd) + ".png", dpi=300)
     plt.grid()
     # plt.show()
     plt.close("all")
