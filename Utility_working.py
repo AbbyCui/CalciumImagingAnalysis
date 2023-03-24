@@ -543,7 +543,9 @@ def getMaxResponse (debug,data,stimStart,stimEnd,Starts,Ends):
             start = int(Starts[j,i]) + dataStart
             end = int(Ends[j,i]) + dataStart
             # if this event occured during the stimulation window
-            if (start >= int(float(stimStart)) and start<= int(float(stimEnd))) or (end >= int(float(stimStart)) and end <= int(float(stimEnd))):
+            if (start >= int(float(stimStart)) and start<= int(float(stimEnd))) or \
+            (end >= int(float(stimStart)) and end <= int(float(stimEnd))) or  \
+            (start<=int(float(stimStart))and end >=int(float(stimEnd))):
                 if debug:
                     print("current start and end:",start,end)
                 maxSignal = max(data[start:end+1,i])
