@@ -44,6 +44,8 @@ smoothed = np.loadtxt(splPATH +"Smoothed.csv",delimiter=',',dtype=str)
 smoothed = Utility.extractData(debug, smoothed, ROIsToRemove = ROIsToRemove, stimStart = stimStart, stimEnd = stimEnd)
 stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols = (0,1,2,3))
 AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",delimiter=',',dtype=str)
+if debug:
+        print("post extractData stimStart=",stimStart,"stimEnd=",stimEnd)
 
 TotalTime = smoothed.shape[0]-1
 TotalROIs = smoothed.shape[1]-1
@@ -53,16 +55,18 @@ if str(ROIs) == "all":
     # arrange(x,y) -> [x,y), so end has to be TotalROIs+1 to include the last ROI
     ROIs = np.arange(1,TotalROIs+1)
 if str(stimEnd) == "all" or str(stimStart) == "all":
-    stimStart = 1
+    stimStart = 0 ##This was changed by CAW to 0 on 2-17-23 as when it was 1 there was a 1 number mismatch when graphing
     stimEnd = TotalTime
-elif int(stimEnd) > TotalTime:
-    stimEnd = TotalTime
+    if debug:
+        print("stimEnd==all")
 
 stimStart = int(stimStart)
 stimEnd = int(stimEnd)
 
 # extract only the wanted ROIs and crop recording to desired time frames
-ROIsmoothed = Utility.extractData(debug, smoothed, ROIs, stimStart = stimStart, stimEnd = stimEnd)
+if debug:
+        print("stimStart=",stimStart,"stimEnd=",stimEnd)
+ROIsmoothed = smoothed ##This used to be an ExtraData and was changed by CAW 2-17-23
 ROIs = ROIsmoothed[0,1:]
 print("plotting experiment ",expNumber, "plane ",planeNumber,"with ",ROIsmoothed.shape[1]-1,"ROIs")
 
@@ -73,7 +77,7 @@ for i in range(1,len(ROIs)+1):
 
     fig = plt.figure() 
     ax = fig.add_subplot()
-    leftxaxis=((round(stimStart/fps/10))*10)
+    leftxaxis=((round(((stimStart)/fps)/10))*10)
     leftxaxis=int(leftxaxis)
     rightxaxis=(round(((stimEnd)/fps/10)*10))
     rightxaxis=int(rightxaxis)
