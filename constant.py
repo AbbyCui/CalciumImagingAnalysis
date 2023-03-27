@@ -17,7 +17,7 @@ SD=5
 ##Output a third sheet which contains the max amp of all stims regardless of threshold (mostly for finding/validating thresholds)
 MaxAll=True
 ##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
-ThresholdsOnly=1
+ThresholdsOnly=0
 
 ##Simple AUC calculations. This is just a simple sum of the thresholded frames within a stim window
 DO_AUC=True
@@ -31,7 +31,7 @@ parentFolder = "#462"
 #Frame per second for the experiment (used only in Plot.py)
 fps = 8.4
 # sample spacing
-T = 1.0 / fps # 8Hz
+T = 1.0 / fps
 
 #window for normalization
 #For a normal recording ~3-400 seconds is fine. For things that last a long time or have prolonged elevations in calcium (4880/GRP) 800 seconds or more seems to be necessary.
@@ -51,7 +51,7 @@ window_size = 9
 polynomial = 3
 
 #Size of graph created by Plot.py
-SecondsPerInch=50 
+SecondsPerInch=400 
 ##you can go as low as 800 for a compact graph but it'll be hard to read.
 # ~300 the bare minimum for 15s VF spacing, but tight, ~50-100 would be better. C
 # CICADA is totally readable at 800
