@@ -11,17 +11,17 @@ debug = False
 #set varyingThreshold to have different threshold for each stimuli for each ROI (e.g. 3 ROI x 5 stimuli = 15 different thresholdds)
 varyingThreshold = True ##set to True to skip median determination of thresholds
 # signal above threshold are considered an event
-threshold = 0.4
+threshold = 0.3
 ##Threshold for SD 
 SD=5
 ##Output a third sheet which contains the max amp of all stims regardless of threshold (mostly for finding/validating thresholds)
 MaxAll=True
 ##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
-ThresholdsOnly=0
+ThresholdsOnly=1
 
 ##Simple AUC calculations. This is just a simple sum of the thresholded frames within a stim window
 DO_AUC=True
-AUC_threshold=0.4
+AUC_threshold=0.3
 AUC_norm=True ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
 
 
@@ -29,12 +29,14 @@ AUC_norm=True ##whether to divide the total AUC by the duration of stim window (
 parentFolder = "#462"
 
 #Frame per second for the experiment (used only in Plot.py)
-fps = 8.46
+fps = 8.4
 # sample spacing
 T = 1.0 / fps # 8Hz
 
 #window for normalization
-window = 2500 
+#For a normal recording ~3-400 seconds is fine. For things that last a long time or have prolonged elevations in calcium (4880/GRP) 800 seconds or more seems to be necessary.
+timewindow = 800 #This is in seconds
+window = (round(timewindow*fps)) #This is in seconds
 #percentile of window for normalization
 percentile=30 ##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. 
 
@@ -49,13 +51,15 @@ window_size = 9
 polynomial = 3
 
 #Size of graph created by Plot.py
-SecondsPerInch=800 
+SecondsPerInch=50 
 ##you can go as low as 800 for a compact graph but it'll be hard to read.
-# ~300 the bare minimum for 15s VF spacing, but tight, ~100 would be better. C
+# ~300 the bare minimum for 15s VF spacing, but tight, ~50-100 would be better. C
 # CICADA is totally readable at 800
 
 #minimum number of frames which meet threshold to be considered a response
-spikeduration=4
+#Spike duration of 4 can work well for pharmacology, but should be reduce for natural stimulations. Also consider the frame rate in this. Around a 350ms duration for natural stims seems reasonable (~3 frames at 8hz)
+spikeduration=3
+
 
 
 #__________________Other variables___________________#
