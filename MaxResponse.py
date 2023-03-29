@@ -20,12 +20,12 @@ from constant import *
 ##if want to customize some varibles, can enter them in terminal (see Unit Test.txt for example)
 try:
     planeNumber = sys.argv[1]
-    print("Starting InterspikeInterval with variables from terminal input: planeNumber:",planeNumber)
+    print("Starting MaxResponse with variables from terminal input: planeNumber:",planeNumber)
 
     splPrefix = expNumber + "_" + planeNumber + "_"
     prefix = expNumber + "_" + planeNumber+ " _frm" + str(stimStart) + "-"+ str(stimEnd)+ "_" 
 except:
-    print("Starting InterSpikeInterval with variables in constant.py")
+    print("Starting MaxResponse with variables in constant.py")
 
 # if have a csv. file with ROIs to remove, it will be included in plotting
 try:
@@ -44,6 +44,33 @@ print("data has dimension:",data.shape)
 
 stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str)
 AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",delimiter=',',dtype=str)
+y,x = AllThresholds.shape
+GoodThresholds = AllThresholds[0:,0] #create new threshold array in which to place the thresholds post ROI removal
+ROInames = ["Frame",] #initiate new empty array
+if debug:
+    print("AllThresholds Shape",AllThresholds.shape)
+    print("y,x",y,x)
+
+for ROI in range(1,x): #skip the 0th row because it's the names 
+    if ROI not in ROIsToRemove:
+        if debug:
+            print("ROI",ROI)
+            print("Allthresholds",AllThresholds[0:,ROI])
+        thisgoodthreshold = AllThresholds[0:,ROI] #take the ROIth column in the data sheet
+        if debug:
+            print(thisgoodthreshold.shape)
+        GoodThresholds = np.vstack((GoodThresholds,thisgoodthreshold)) #stack on top
+        ROIname = data[0,ROI]
+        ROInames = np.append(ROInames,ROIname)
+        if debug:
+            print("ROIname",ROIname)
+    else:
+        if debug:
+            print("ROI in ROIsToRemove",ROI)
+AllThresholds = GoodThresholds.T #correct the axis of the data -> one colum for each ROI
+if debug:
+    np.savetxt(pathToOutputData + splPrefix + "Goodthresholds.csv", AllThresholds, delimiter=',', comments='', fmt='%s')
+
 stimNum = stimulus.shape[0]
 
 #extract only the desired ROIs (extract all frames)
@@ -51,6 +78,9 @@ ROIdata = Utility.extractData(debug, data, ROIs, ROIsToRemove, stimStart = 1, st
 print("ROIdata has shape:",ROIdata.shape)
 Starts,Ends = Utility.extractEvent(debug, ROIdata, stimulus, AllThresholds)
 ROInum = ROIdata.shape[1]-1
+if debug:
+    np.savetxt(pathToOutputData + splPrefix + "starts.csv", Starts, delimiter=',', comments='', fmt='%s')
+    np.savetxt(pathToOutputData + splPrefix + "ends.csv", Ends, delimiter=',', comments='', fmt='%s')
 
 #initialize maxResponse with the same number of rows as stimulus, 
 # but the number of columns as number of ROI
