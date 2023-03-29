@@ -393,16 +393,18 @@ def extractEvent(debug,data,stim,AllThresholds):
     
     for x in range(1,xs): #for each ROI
         event = 0 #initialize event number as 0
-        s = 1 # initialize stimlus index as 1
+        s = 0 # initialize stimlus index as 1 *this was abby's code. I think it needs to be 0 because the stim array has no title so this is skipping the 1st stim row
         for y in range(1,ys): #for each frame in this ROI
             thisData = float(data[y,x]) #extract raw data and change to float
             #determine threshold based on which stimuli this current frame is in
             for i in range(s,stimNum):
                 if y >= float(stim[i,1]) and y <= float(stim[i,2]):
                     s = i
-                    break
-            thisThreshold = float(AllThresholds[s,x])
-
+                    break     
+            st=s+1 #this needs to be +1 relative to the stim array as it contains the title row
+            thisThreshold = float(AllThresholds[st,x])
+            if debug:
+                print("ith stim is",s,"time",y,"x",x,"thisthresh",thisThreshold)
             # find events 
             if thisData>thisThreshold:
                 spikesInOnes[y,x] = 1
