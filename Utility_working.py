@@ -734,10 +734,10 @@ def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
                 area=trapz(tdata,dx=constant.T) ##this uses the trapezoid rule which is more accurate than a simple sum
                 curr_AUC = curr_AUC + area
                 curr_AvgAmplitude = curr_AvgAmplitude + max(tdata)
-                curr_EventWidth = curr_EventWidth + ((end-start)+1)
+                curr_EventWidth = curr_EventWidth + ((end-start))
                 
                 if debug:
-                    print("max sig=",maxSignal)
+                    print("curr_AvgAmplitude=",curr_AvgAmplitude)
                     print("curr_AUC =",curr_AUC)
                 
 
