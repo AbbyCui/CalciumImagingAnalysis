@@ -11,18 +11,17 @@ debug = False
 #set varyingThreshold to have different threshold for each stimuli for each ROI (e.g. 3 ROI x 5 stimuli = 15 different thresholdds)
 varyingThreshold = True ##set to True to skip median determination of thresholds
 # signal above threshold are considered an event
-threshold = 0.3
+threshold = 0.2
 ##Threshold for SD 
-SD=5
+SD=7
 ##Output a third sheet which contains the max amp of all stims regardless of threshold (mostly for finding/validating thresholds)
 MaxAll=True
 ##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
-ThresholdsOnly=0
+ThresholdsOnly=1
 
 ##Simple AUC calculations. This is just a simple sum of the thresholded frames within a stim window
 DO_AUC=True
-AUC_threshold=0.3
-AUC_norm=True ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
+AUC_norm=False ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
 
 
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
@@ -31,7 +30,7 @@ parentFolder = "#462"
 #Frame per second for the experiment (used only in Plot.py)
 fps = 8.4
 # sample spacing
-T = 1.0 / fps
+T = 1.0 / fps # 8Hz
 
 #window for normalization
 #For a normal recording ~3-400 seconds is fine. For things that last a long time or have prolonged elevations in calcium (4880/GRP) 800 seconds or more seems to be necessary.
