@@ -55,8 +55,9 @@ SecondsPerInch=400
 # ~300 the bare minimum for 15s VF spacing, but tight, ~50-100 would be better. C
 # CICADA is totally readable at 800
 
-#minimum number of frames which meet threshold to be considered a response
-#Spike duration of 4 can work well for pharmacology, but should be reduce for natural stimulations. Also consider the frame rate in this. Around a 350ms duration for natural stims seems reasonable (~3 frames at 8hz)
+#minimum width of event to be considered a response
+#Spike duration of 4 can work well for pharmacology, but should be reduce for natural stimulations. Also consider the frame rate in this. Around a 350ms duration for natural stims seems reasonable (~4 frames at 8hz)
+#Note that this is the width, not the number of frames. e.g. there are 4 frames above threshold (e.g. frame 100 (start) through 103 (end)) but, the end-start=3 and this is what this is checking.
 spikeduration=3
 
 
