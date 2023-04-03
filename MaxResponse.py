@@ -180,7 +180,7 @@ TotalAUC_StimulusNames = np.array(["AUC_"]*len(StimulusNames))
 TotalAUC_StimulusNames = np.core.defchararray.add(TotalAUC_StimulusNames, StimulusNames)
 TotalAUC = np.hstack((TotalAUC_StimulusNames[:, None],TotalAUC))
 
-Events_StimulusNames = np.array(["#Events_"]*len(StimulusNames))
+Events_StimulusNames = np.array(["Events_"]*len(StimulusNames))
 Events_StimulusNames = np.core.defchararray.add(Events_StimulusNames, StimulusNames)
 Events = np.hstack((Events_StimulusNames[:, None],Events))
 
@@ -206,7 +206,7 @@ if(MaxAll==True):
         maxResponse = np.vstack((maxResponse,responders,MaxResponseAll,TotalAUC,Events,EventAmp,EventWidth))
     else: maxResponse = np.vstack((maxResponse,responders,MaxResponseAll))
 else:
-    #put responders on the b0ottom of maxResponse
+    #put responders on the bottom of maxResponse
     if(DO_AUC==True):
         maxResponse = np.vstack((maxResponse,responders,MaxResponseAll,TotalAUC,Events,EventAmp,EventWidth))
     else:maxResponse = np.vstack((maxResponse,responders))
