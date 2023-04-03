@@ -1,5 +1,7 @@
 import numpy as np
 from scipy import signal
+from scipy.integrate import simpson
+from numpy import trapz
 from pandas import array, DataFrame, cut
 import statistics
 import constant as constant
@@ -640,7 +642,7 @@ def getMaxResponseAll (debug,data,stimStart,stimEnd,Starts,Ends):
         c+=1
     return MaxResponseAll
 
-def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
+def getAUCv0 (debug,data,stimStart,stimEnd,Starts,Ends):
     '''
     Get the AUC  of each ROIs for ONE stimulus with defined start and end
     Input: smoothed data, int for the start and the end of the stimulus,
@@ -676,3 +678,82 @@ def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
         else: AUC[0,(c-1)]=AUCtemp
         c+=1
     return AUC
+
+def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
+    '''
+    Get the AUC  of each ROIs for ONE stimulus with defined start and end
+    Input: smoothed data, int for the start and the end of the stimulus,
+        and Starts and Ends dataframe with the starting and ending frames for each event
+    Output: AUC dataframe with 1 row, and the same number of columns the number of ROIs (no header)
+    '''
+    if debug:
+        print("----------getAUC function----------")
+    #get dimension of data
+    y,x = data.shape
+    stimwindow=(stimEnd-stimStart)
+    duration=(((stimwindow/constant.fps)/60)) ##this is in minutes
+    #get the starting frame of data
+    dataStart = int(float(data[1,0]))
+    #initialize AUCTotal with 2 rows, and the same number of columns as data
+    AUCTotal = np.zeros((1,x-1))
+    AvgAmplitude = np.zeros((1,x-1))
+    AvgEventWidth = np.zeros((1,x-1))
+    NumEvents = np.zeros((1,x-1))
+
+    # for each ROI
+    for i in range(1,x):
+        #if the last frame is above threshold, there will be more values in "starts" than "ends" for this ROI
+        numStart = np.count_nonzero(Starts[...,i])
+        numEnd = np.count_nonzero(Ends[...,i])
+
+        curr_NumEvents = 0
+        curr_AUC = 0.0
+        curr_AvgAmplitude = 0.0
+        curr_EventWidth = 0.0
+
+        # fill up starts and ends to give them the same lengths
+        if numStart > numEnd:
+            #if more starts than ends, add a value to ends = the last frame of the recording
+            Ends[numEnd+1,i] = data[y-1,0]
+        elif numEnd>numStart:
+            Starts[1,i] = 1
+        # for each event in Starts/Ends
+        for j in range (1,numStart+1):
+            start = int(Starts[j,i]) + dataStart
+            end = int(Ends[j,i]) + dataStart
+            # if this event occured during the stimulation window
+            if (start >= int(float(stimStart)) and start<= int(float(stimEnd))): ## this changed from the typical as I only ever want to count each spike once (e.g. for back to back windows) so only the start is considered
+                if ((end-start)>(1000)): ## This makes sure that there aren't any weirdly long events (~>2 minutes long) that suggest a manual check of the data is necessary
+                    print("ROI",data[0,i],"has an event between frames",start,"and",end,"which lasts for more than 1000 frames, consider checking raw data")
+                if debug:
+                    print("current start and end:",start,end)
+
+                curr_NumEvents = curr_NumEvents+1
+                tdata=data[start:end+1,i]
+                tdata = tdata.astype(float)
+                area=trapz(tdata,dx=constant.T) ##this uses the trapezoid rule which is more accurate than a simple sum
+                curr_AUC = curr_AUC + area
+                curr_AvgAmplitude = curr_AvgAmplitude + max(tdata)
+                curr_EventWidth = curr_EventWidth + ((end-start)+1)
+                
+                if debug:
+                    print("max sig=",maxSignal)
+                    print("curr_AUC =",curr_AUC)
+                
+
+        if(constant.AUC_norm==True):
+            curr_AUC = ((curr_AUC)/duration) ##this give AUC per minute
+        else: curr_AUC = (curr_AUC)
+        if curr_NumEvents==0:
+            curr_AvgAmplitude=0
+        else: curr_AvgAmplitude = curr_AvgAmplitude/curr_NumEvents
+        if curr_NumEvents==0:
+            curr_EventWidth=0
+        else:curr_EventWidth = ((curr_EventWidth/curr_NumEvents)*constant.T)
+
+        AUCTotal[0,i-1] = curr_AUC
+        NumEvents[0,i-1] = curr_NumEvents
+        AvgAmplitude[0,i-1] = curr_AvgAmplitude
+        AvgEventWidth[0,i-1] = curr_EventWidth
+
+    return AUCTotal,NumEvents,AvgAmplitude,AvgEventWidth
