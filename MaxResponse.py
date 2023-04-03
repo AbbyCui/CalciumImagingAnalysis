@@ -135,7 +135,10 @@ if(MaxAll==True):
 #initialize AUC with the same number of rows as stimulus, 
 # but the number of columns as number of ROI
 if(DO_AUC==True):
-    AUC = np.zeros((stimNum,ROInum))
+    TotalAUC = np.zeros((stimNum,ROInum))
+    Events = np.zeros((stimNum,ROInum))
+    EventAmp = np.zeros((stimNum,ROInum))
+    EventWidth = np.zeros((stimNum,ROInum))
     ROInames = ROIdata[0,...] #including [0,0]
     StimulusNames = stimulus[...,0]
     # for each stimulus (each row), get maxResponse of each ROI
@@ -147,8 +150,11 @@ if(DO_AUC==True):
         if debug:
             print("for stimulus:",stimName ,", stimStart =",stimStart,"stimEnd =",stimEnd)
         #get data from all ROI
-        thisAUC = Utility.getAUC(debug, ROIdata, stimStart, stimEnd, Starts, Ends)##DO THE THING AND ASSIGN THE number to a variable
-        AUC[i,...] = thisAUC.astype(str) ##append the number to the appropriate column
+        AUCTotal,NumEvents,AvgAmplitude,AvgEventWidth = Utility.getAUC(debug, ROIdata, stimStart, stimEnd, Starts, Ends)##DO THE THING AND ASSIGN THE number to a variable
+        TotalAUC[i,...] = AUCTotal.astype(str) ##append the number to the appropriate column
+        Events[i,...] = NumEvents.astype(str) ##append the number to the appropriate column
+        EventAmp[i,...] = AvgAmplitude.astype(str) ##append the number to the appropriate column
+        EventWidth[i,...] = AvgEventWidth.astype(str) ##append the number to the appropriate column
 
 
 #duplicate maxResponse, then change all values >0 to 1 to indicate responder
@@ -170,9 +176,21 @@ Amp_StimulusNames = np.core.defchararray.add(Amp_StimulusNames, StimulusNames)
 MaxResponseAll = np.hstack((Amp_StimulusNames[:, None],MaxResponseAll))
 
 # add back the stimulus names to AUC
-AUC_StimulusNames = np.array(["AUC_"]*len(StimulusNames))
-AUC_StimulusNames = np.core.defchararray.add(AUC_StimulusNames, StimulusNames)
-AUC = np.hstack((AUC_StimulusNames[:, None],AUC))
+TotalAUC_StimulusNames = np.array(["AUC_"]*len(StimulusNames))
+TotalAUC_StimulusNames = np.core.defchararray.add(TotalAUC_StimulusNames, StimulusNames)
+TotalAUC = np.hstack((TotalAUC_StimulusNames[:, None],TotalAUC))
+
+Events_StimulusNames = np.array(["#Events_"]*len(StimulusNames))
+Events_StimulusNames = np.core.defchararray.add(Events_StimulusNames, StimulusNames)
+Events = np.hstack((Events_StimulusNames[:, None],Events))
+
+EventAmp_StimulusNames = np.array(["AvgEventAmp_"]*len(StimulusNames))
+EventAmp_StimulusNames = np.core.defchararray.add(EventAmp_StimulusNames, StimulusNames)
+EventAmp = np.hstack((EventAmp_StimulusNames[:, None],EventAmp))
+
+EventWidth_StimulusNames = np.array(["AvgEventWidth_"]*len(StimulusNames))
+EventWidth_StimulusNames = np.core.defchararray.add(EventWidth_StimulusNames, StimulusNames)
+EventWidth = np.hstack((EventWidth_StimulusNames[:, None],EventWidth))
 
 #make headers for responders for each stimulus (e.g. "Res_3nM GRP")
 Res_StimulusNames = np.array(["Binary_"]*len(StimulusNames))
@@ -183,14 +201,14 @@ if debug:
 responders = np.hstack((Res_StimulusNames[:, None],responders))
 
 if(MaxAll==True):
-    #stack all 3 values
+    #stack all the arrays
     if(DO_AUC==True):
-        maxResponse = np.vstack((maxResponse,responders,MaxResponseAll,AUC))
+        maxResponse = np.vstack((maxResponse,responders,MaxResponseAll,TotalAUC,Events,EventAmp,EventWidth))
     else: maxResponse = np.vstack((maxResponse,responders,MaxResponseAll))
 else:
     #put responders on the b0ottom of maxResponse
     if(DO_AUC==True):
-        maxResponse = np.vstack((maxResponse,responders,MaxResponseAll,AUC))
+        maxResponse = np.vstack((maxResponse,responders,MaxResponseAll,TotalAUC,Events,EventAmp,EventWidth))
     else:maxResponse = np.vstack((maxResponse,responders))
 
 #save maxResponse
