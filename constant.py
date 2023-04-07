@@ -8,6 +8,7 @@ import numpy as np
 
 #set debug to True to show all debugging statements, and set to False to hide all (also saves time)
 debug = False
+debugCSV = False ##this is just outputting the various other CSVs for debugging or checking, e.g. Event Start and Stop Times, good/bad thresholds, etc
 #set varyingThreshold to have different threshold for each stimuli for each ROI (e.g. 3 ROI x 5 stimuli = 15 different thresholdds)
 varyingThreshold = True ##set to True to skip median determination of thresholds
 # signal above threshold are considered an event
@@ -20,6 +21,7 @@ MaxAll=True
 ThresholdsOnly=1
 
 ##Simple AUC calculations. This is just a simple sum of the thresholded frames within a stim window
+#of note, the AUC will be limited to the stimwindow, i.e. if the decay/calcium lasts longer than the window it will underestimate the AUC
 DO_AUC=True
 AUC_norm=False ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
 
