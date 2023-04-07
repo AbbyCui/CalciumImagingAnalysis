@@ -68,17 +68,16 @@ for ROI in range(1,x): #skip the 0th row because it's the names
         if debug:
             print("ROI in ROIsToRemove",ROI)
 AllThresholds = GoodThresholds.T #correct the axis of the data -> one colum for each ROI
-if debug:
+if debugCSV:
     np.savetxt(pathToOutputData + splPrefix + "Goodthresholds.csv", AllThresholds, delimiter=',', comments='', fmt='%s')
 
 stimNum = stimulus.shape[0]
 
 #extract only the desired ROIs (extract all frames)
 ROIdata = Utility.extractData(debug, data, ROIs, ROIsToRemove, stimStart = 1, stimEnd = "all") 
-print("ROIdata has shape:",ROIdata.shape)
 Starts,Ends = Utility.extractEvent(debug, ROIdata, stimulus, AllThresholds)
 ROInum = ROIdata.shape[1]-1
-if debug:
+if debugCSV:
     np.savetxt(pathToOutputData + splPrefix + "starts.csv", Starts, delimiter=',', comments='', fmt='%s')
     np.savetxt(pathToOutputData + splPrefix + "ends.csv", Ends, delimiter=',', comments='', fmt='%s')
 
