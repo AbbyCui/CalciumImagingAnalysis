@@ -3,19 +3,40 @@ python path/to/pythonFile, path/to/dataFile
 
 Run these commands all at once (make sure to include a return at the end)
     python ProcessData.py "P0"
-    python ProcessData.py "P1"
-    python ProcessData.py "P2"
-    python ProcessData.py "P3"
+    python Plot.py "P0" 1 "all"
+    python Plot.py "P1" 1 "all"
+    python Plot.py "P2" 1 "all"
+    python Plot.py "P3" 1 "all"
+
+
+    python ProcessData.py "P4"
     "finished"
 
 # raw screening of bad ROIs, also get a sense of how to analyze
     plot.py P0 5000 10000  (this plots frames 5000 to 10000)
    Input arguments are: Plot.py ["plane"] [start] [stop]
+    python ProcessData.py "P0"
+    
 
+    python ProcessData.py "P1"
+    python ProcessData.py "P2"
+    python ProcessData.py "P3"
+    python ProcessData.py "P4"
+    python ProcessData.py "P5"
+
+    
+    python ProcessData.py "P2"
+    python ProcessData.py "P3"
+    python ProcessData.py "P4"
+    python ProcessData.py "P5"
+
+    python ProcessData.py "P1"
     python Plot.py "P0" 1 "all"
     python Plot.py "P1" 1 "all"
     python Plot.py "P2" 1 "all"
     python Plot.py "P3" 1 "all"
+    python Plot.py "P4" 1 "all"
+    python Plot.py "P5" 1 "all"
     "finished"
 
     secondsperinch (100-800 are good numbers). Default is 800, but you can change it in the constant file if desired

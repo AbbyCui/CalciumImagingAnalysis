@@ -110,7 +110,7 @@ def extractData (debug, data, ROIs = "all", ROIsToRemove = [], stimStart = 0, st
             if ROI not in ROIsToRemove:
                 ROIdata = data[stimStart:stimEnd,ROI] #take the ROIth column in the data sheet
                 ROIsdata = np.vstack((ROIsdata,ROIdata)) #stack on top
-                ROIname = data[0,ROI]
+                ROIname = "AC_exp"+constant.prefix[1:]+data[0,ROI]
                 ROInames = np.append(ROInames,ROIname)
             else:
                 if debug:
@@ -366,7 +366,7 @@ def getAllThresholds(debug,data,stim,fps,threshold):
             if debug:
                 print("varying threshold = False")
     return AllThresholds
-    
+
 def extractEvent(debug,data,stim,AllThresholds):
     """
     extract the start and end of each event, as well as a dataframe with 1s representing frames above threshold and 0s representing frames below threshold
@@ -375,7 +375,7 @@ def extractEvent(debug,data,stim,AllThresholds):
     also output spikesInOnes with the same dimensions and headers as data, but each value are mutated to 1 if the value is above threshold, or 0 if below
     """
     if debug:
-        print("----------eventCounter function----------")
+        print("----------extractEvent function----------")
 
     # spikeInOnes have the same dimensions and headers as data, but filled with zeros (below threshold) or ones (above threshold)
     spikesInOnes = np.zeros_like(data)
@@ -384,8 +384,10 @@ def extractEvent(debug,data,stim,AllThresholds):
     ys,xs = data.shape
     stimNum = stim.shape[0]-1
     # startsAndEnds have the same dimensions and headers as data, but filled with tuples of (start,end) frame numbers for each event
-    Starts = np.zeros_like(data,dtype = float)
-    Ends = np.zeros_like(data,dtype = float)
+    Starts = np.empty_like(data,dtype = float)
+    Ends = np.empty_like(data,dtype = float)
+    FrAboveThreshold = np.empty_like(data,dtype = float)
+    MidSpike = np.empty_like(data,dtype = float)
     if debug:
         print("ys =",ys)
         print("xs =",xs)
@@ -397,8 +399,10 @@ def extractEvent(debug,data,stim,AllThresholds):
         for y in range(1,ys): #for each frame in this ROI
             thisData = float(data[y,x]) #extract raw data and change to float
             #determine threshold based on which stimuli this current frame is in
-            for i in range(s,stimNum):
+            for i in range(s,stimNum): #i-th stimulus
                 if y >= float(stim[i,1]) and y <= float(stim[i,2]):
+                    if debug and y%100 == 1:
+                        print("stimstart",float(stim[i,1]),y) 
                     s = i
                     break
             thisThreshold = float(AllThresholds[s,x])
@@ -424,6 +428,12 @@ def extractEvent(debug,data,stim,AllThresholds):
                             event += 1
                             Starts[event,x] = start
                             Ends[event,x] = end
+                            f = end-start
+                            FrAboveThreshold[event,x] = f
+                            mid = start+end/2
+                            MidSpike [event,x] = mid
+                            if debug and event  == 1:
+                                print("ROI",x,"has first event from",start,'to',end,'lasting',fm,'frames')
                             #then reset start and end
                             start = 0
                             end = 0
@@ -432,10 +442,11 @@ def extractEvent(debug,data,stim,AllThresholds):
                         print("reached the first or the last row")
             else: 
                 spikesInOnes[y,x] = 0
+ 
     if debug:
         print("Starts has shape:",Starts.shape)
         print("Ends has shape:",Ends.shape)
-    return Starts, Ends
+    return Starts, Ends, FrAboveThreshold,MidSpike
    
 def eventCounter (debug, Starts):
     """
@@ -543,7 +554,9 @@ def getMaxResponse (debug,data,stimStart,stimEnd,Starts,Ends):
             start = int(Starts[j,i]) + dataStart
             end = int(Ends[j,i]) + dataStart
             # if this event occured during the stimulation window
-            if (start >= int(float(stimStart)) and start<= int(float(stimEnd))) or (end >= int(float(stimStart)) and end <= int(float(stimEnd))):
+            if (start >= int(float(stimStart)) and start<= int(float(stimEnd))) or \
+            (end >= int(float(stimStart)) and end <= int(float(stimEnd))) or  \
+            (start<=int(float(stimStart))and end >=int(float(stimEnd))): 
                 if debug:
                     print("current start and end:",start,end)
                 maxSignal = max(data[start:end+1,i])
@@ -672,3 +685,4 @@ def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
         else: AUC[0,(c-1)]=AUCtemp
         c+=1
     return AUC
+

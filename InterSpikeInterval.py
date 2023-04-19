@@ -13,7 +13,6 @@ import sys
 import matplotlib.pyplot as plt
 from constant import *
 
-#TODO: Allow python to generate OUtputdata and Figure folders
 ##if want to customize some varibles, can enter them in terminal (see Unit Test.txt for example)
 try:
     planeNumber = sys.argv[1]
@@ -30,26 +29,37 @@ except:
 # if have a csv. file with ROIs to remove, it will be included in plotting
 try:
     AllROIsToRemove = np.loadtxt(pathToData +"BadROIs.csv",delimiter=',',dtype=str)
+    ROIsToRemove=Utility.getROIsToRemove(debug, AllROIsToRemove, plane = planeNumber)
 except:
-    AllROIsToRemove = np.zeros((3, 6))
+    ROIsToRemove = []
     print("plotting all ROIs")
 
 #import smoothed data
 data = np.loadtxt(pathToOutputData + splPrefix +"Smoothed.csv",delimiter=',',dtype=str)
 AllThresholds = np.loadtxt(pathToOutputData + prefix +"AllThresholds.csv",delimiter=',',dtype=str)
-ROIsToRemove=Utility.getROIsToRemove(debug, AllROIsToRemove, plane = planeNumber)
+stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols = (0,1,2,3))
 ROIdata = Utility.extractData(debug, data, ROIs, ROIsToRemove, stimStart = stimStart, stimEnd = stimEnd) 
 
-Starts,Ends = Utility.extractEvent(debug, ROIdata, threshold, baselineStart,baselineEnd)
+Starts,Ends,frAboveThreshold,MidSpike = Utility.extractEvent(debug, ROIdata, stimulus,AllThresholds)
 eventNumber = Utility.eventCounter(debug, Starts)
 ISI = Utility.ISI(debug, ROIdata, Starts)
-eventAmp = Utility.getEventAmp(debug, ROIdata, Starts, Ends)
+#eventAmp = Utility.getEventAmp(debug, ROIdata, Starts, Ends)
+
+Starts= Starts.astype('object').astype('str')
+Ends = Ends.astype('object').astype('str')
+frAboveThreshold = frAboveThreshold.astype('object').astype('str')
+
+Starts[0,1:]= ROIdata[0,1:]
+Ends[0,1:] = ROIdata[0,1:]
+frAboveThreshold[0,1:] = ROIdata[0,1:]
 
 
 np.savetxt(pathToOutputData + prefix + "Starts.csv", Starts, delimiter=',', comments='', fmt='%s')
 np.savetxt(pathToOutputData + prefix + "Ends.csv", Ends, delimiter=',', comments='', fmt='%s')
 np.savetxt(pathToOutputData + expNumber + "_" + planeNumber + "_" + "AllThresholds.csv", AllThresholds, delimiter=',', comments='', fmt='%s')
-znp.savetxt(pathToOutputData + prefix + "EventNumber.csv", eventNumber, delimiter=',', comments='', fmt='%s')
+np.savetxt(pathToOutputData + prefix + "EventNumber.csv", eventNumber, delimiter=',', comments='', fmt='%s')
 np.savetxt(pathToOutputData + prefix + "ROINames.csv", ROIdata[0,...], delimiter=',', comments='', fmt='%s')
 np.savetxt(pathToOutputData + prefix + "ISI.csv", ISI, delimiter=',', comments='', fmt='%s')
-np.savetxt(pathToOutputData + prefix + "EventAmp.csv", eventAmp, delimiter=',', comments='', fmt='%s')
+np.savetxt(pathToOutputData + prefix + "Frames_above_Threshold.csv", frAboveThreshold, delimiter=',', comments='', fmt='%s')
+np.savetxt(pathToOutputData + prefix + "Spike_Median.csv", MidSpike, delimiter=',', comments='', fmt='%s')
+#np.savetxt(pathToOutputData + prefix + "EventAmp.csv", eventAmp, delimiter=',', comments='', fmt='%s')

@@ -47,7 +47,7 @@ AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",del
 
 TotalTime = smoothed.shape[0]-1
 TotalROIs = smoothed.shape[1]-1
-print("plotting experiment ",expNumber, "plane ",planeNumber,"with ",TotalROIs,"ROIs")
+print("plotting experiment ",expNumber, "plane ",planeNumber,"with ",TotalROIs,"ROIs", "from frame",stimStart,'to',stimEnd)
 
 if str(ROIs) == "all":
     # arrange(x,y) -> [x,y), so end has to be TotalROIs+1 to include the last ROI
@@ -63,12 +63,13 @@ stimEnd = int(stimEnd)
 
 # extract only the wanted ROIs and crop recording to desired time frames
 ROIsmoothed = Utility.extractData(debug, smoothed, ROIs, stimStart = stimStart, stimEnd = stimEnd)
-ROIs = ROIsmoothed[0,1:]
-print("plotting experiment ",expNumber, "plane ",planeNumber,"with ",ROIsmoothed.shape[1]-1,"ROIs")
+ROIs = ROIsmoothed[0,1:] #AC_exp17_P0_Mean1
+
 
 # range(x,y) -> [x,y), so end has to be len(ROI)+1 to include the last ROI
+rawTime = ROIsmoothed[1:,0]
 for i in range(1,len(ROIs)+1):
-    ROI = str(ROIs[i-1])[4:]
+    ROI = str(ROIs[i-1])
     rawSmoothed = ROIsmoothed[1:,i].astype(float,copy=False)
 
     fig = plt.figure() 
@@ -86,9 +87,11 @@ for i in range(1,len(ROIs)+1):
         figsize=1
         print("X-axis too small, increase range or the seconds/inch")
     fig.set_size_inches(figsize, 5)
-    plt.title(expNumber + " "+planeNumber +" ROI=" + ROI, loc='center', y=.9)
+    plt.title(ROI, loc='center', y=.9)
+    #plt.title(expNumber + " "+planeNumber +" ROI=" + ROI, loc='center', y=.9)
     plt.xlabel("Time (sec)")
     plt.plot(np.arange(stimStart, stimEnd, step = 1)/fps,rawSmoothed,linewidth=1)
+    #plt.plot(rawTime/fps,rawSmoothed,linewidth=1)
     plt.tight_layout()
     plt.axis()
     yaxismax=3
@@ -109,13 +112,14 @@ for i in range(1,len(ROIs)+1):
         plt.xticks(xmarks,minor=True)
     
     #mark each stimulus with shadings and draw threshold for them with red line
-    for j in range(1,stimulus.shape[0]):
+    for j in range(1,stimulus.shape[0]+1):
         stimName = stimulus[j-1,0]
         thisThreshold = float(AllThresholds[j,i])
         start = int(float(stimulus[j-1,1]))/fps
         end = int(float(stimulus[j-1,2]))/fps
         percentStart = (start-left)/(right-left)
         percentEnd = (end-left)/(right-left)
+
         #try to find color in Stimulus.csv
         #if fail (not provided), default to grey
         try:
@@ -126,14 +130,13 @@ for i in range(1,len(ROIs)+1):
                 print("no color provided in Stimulus.csv. Color defaulted to grey")
         if debug:
             print("for stimulus:",stimName ,", stimStart =",start,percentStart,"stimEnd =",end,percentEnd,"color is",color,"threshold is",thisThreshold)
-            # print(" ")
         # if the window plotted include only a part of a stimuli window, still draw the shadings
         if start >= stimStart/fps and end <= stimEnd/fps:
             plt.axvspan(start, end, alpha=0.3, color=color) 
             plt.axhline (y = thisThreshold, xmin =percentStart, xmax =percentEnd, color='red', linewidth = 1 )
             plt.text(start, (yaxismax), stimName, rotation=-45, fontsize=12, wrap=False, ha='right')
 
-    plt.savefig(pathToFigure + expNumber+"_" + planeNumber + "_ROI" + ROI + "_"+str(stimStart) + "-" + str(stimEnd) + ".png")
+    plt.savefig(pathToFigure + ROI + "_"+str(stimStart) + "-" + str(stimEnd) + ".png")
     plt.grid()
     # plt.show()
     plt.close("all")
