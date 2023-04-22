@@ -19,6 +19,7 @@ try:
     splPrefix = expNumber + "_" + planeNumber + "_"
     prefix = expNumber + "_" + planeNumber+ " _frm" + str(stimStart) + "-"+ str(stimEnd)+ "_" 
     pathToRaw = "../"+parentFolder+"/Data/"+parentFolder+"_"+planeNumber+"_"
+    pathToFigure = "../"+parentFolder+"/"+"Figure/"
     print("using constants from terminal input: INPUT: ",pathToOutputData + splPrefix +"Smoothed.csv","OUTPUT:",pathToFigure + expNumber+"_" + planeNumber)
 except:
     print("Starting Plot.py with variables in constant.py")
@@ -63,13 +64,14 @@ stimEnd = int(stimEnd)
 
 # extract only the wanted ROIs and crop recording to desired time frames
 ROIsmoothed = Utility.extractData(debug, smoothed, ROIs, stimStart = stimStart, stimEnd = stimEnd)
-ROIs = ROIsmoothed[0,1:] #AC_exp17_P0_Mean1
+ROIs = ROIsmoothed[0,1:] #Mean1
+
 
 
 # range(x,y) -> [x,y), so end has to be len(ROI)+1 to include the last ROI
 rawTime = ROIsmoothed[1:,0]
 for i in range(1,len(ROIs)+1):
-    ROI = str(ROIs[i-1])
+    ROI = "AC_exp"+parentFolder[1:]+"_"+planeNumber +"_ROI_"+ str(ROIs[i-1][4:])
     rawSmoothed = ROIsmoothed[1:,i].astype(float,copy=False)
 
     fig = plt.figure() 
@@ -137,6 +139,10 @@ for i in range(1,len(ROIs)+1):
             plt.text(start, (yaxismax), stimName, rotation=-45, fontsize=12, wrap=False, ha='right')
 
     plt.savefig(pathToFigure + ROI + "_"+str(stimStart) + "-" + str(stimEnd) + ".png")
+
+  
     plt.grid()
     # plt.show()
     plt.close("all")
+
+print(ROI)

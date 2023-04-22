@@ -49,7 +49,7 @@ window_size = 15
 polynomial = 3
 
 #Size of graph created by Plot.py
-SecondsPerInch=100
+SecondsPerInch=300
 ##you can go as low as 800 for a compact graph but it'll be hard to read.
 # ~300 the bare minimum for 15s VF spacing, but tight, ~100 would be better. C
 # CICADA is totally readable at 800
@@ -61,7 +61,7 @@ spikeduration=4
 #__________________Other variables___________________#
 
 #to be added to each file name
-planeNumber= "P1"
+planeNumber= "P99"
 
 #start of the stimulus (in frames, cannot be 0, must be >=1)
 #input stimStart = "all" if want the entirety of the recording

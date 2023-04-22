@@ -3,11 +3,16 @@ python path/to/pythonFile, path/to/dataFile
 
 Run these commands all at once (make sure to include a return at the end)
     python ProcessData.py "P0"
+    python ProcessData.py "P1"
+    python ProcessData.py "P2"
+    python ProcessData.py "P3"
+    python ProcessData.py "P4"
+
     python Plot.py "P0" 1 "all"
     python Plot.py "P1" 1 "all"
     python Plot.py "P2" 1 "all"
     python Plot.py "P3" 1 "all"
-
+    python Plot.py "P4" 1 "all"
 
     python ProcessData.py "P4"
     "finished"

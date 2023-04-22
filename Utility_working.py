@@ -110,7 +110,7 @@ def extractData (debug, data, ROIs = "all", ROIsToRemove = [], stimStart = 0, st
             if ROI not in ROIsToRemove:
                 ROIdata = data[stimStart:stimEnd,ROI] #take the ROIth column in the data sheet
                 ROIsdata = np.vstack((ROIsdata,ROIdata)) #stack on top
-                ROIname = "AC_exp"+constant.prefix[1:]+data[0,ROI]
+                ROIname = data[0,ROI]
                 ROInames = np.append(ROInames,ROIname)
             else:
                 if debug:
