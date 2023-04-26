@@ -20,11 +20,10 @@ MaxAll=True
 ##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
 ThresholdsOnly=1
 
-##Simple AUC calculations. This is just a simple sum of the thresholded frames within a stim window
+##This uses the Events (starts/stops) to find events and then only calculates AUC of the detected events
 #of note, the AUC will be limited to the stimwindow, i.e. if the decay/calcium lasts longer than the window it will underestimate the AUC
 DO_AUC=True
 AUC_norm=False ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
-
 
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
 parentFolder = "#462"
