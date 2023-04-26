@@ -36,7 +36,7 @@ T = 1.0 / fps # 8Hz
 #window for normalization
 #For a normal recording ~3-400 seconds is fine. For things that last a long time or have prolonged elevations in calcium (4880/GRP) 800 seconds or more seems to be necessary.
 timewindow = 800 #This is in seconds
-window = (round(timewindow*fps)) #This is in seconds
+window = (round(timewindow*fps)) #This converts the seconds to frames
 #percentile of window for normalization
 percentile=30 ##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. 
 
