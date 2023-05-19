@@ -14,7 +14,7 @@ Then create a folder called the same thing (Exp#462) and within it create a fold
 
 ![image](https://user-images.githubusercontent.com/81972652/193972095-c63ea7de-ea6e-4dda-ae69-8981fde2ee41.png)
 
-Inside the stimulus file, columm 1 is the name of each stimuli. **Do no include commas or #!** comma in csv files indicate "next cell" and will not be interpreted as a part of the text. The second and the third columns are the start and end of each stimulus (in frames). Fourth column is optional, and can be used to indicate the color you want the stimulus to be during plotting. If nothing is entered, all stimuli will be defult to grey.
+Inside the stimulus file, columm 1 is the name of each stimuli. **Do no include commas or #!** comma in csv files indicate "next cell" and will not be interpreted as a part of the text. The second and the third columns are the start and end of each stimulus (in frames). Fourth column is optional, and can be used to indicate the color you want the stimulus to be during plotting. If nothing is entered, all stimuli will be defult to grey. If you ever have weird errors e.g. blanks values being imported copy the 4 columns and x rows into a new CSV and save it. I've had it happen once or twice that there must have been some extraneous blank cells included in the CSV when excel saved.
 
 ![image](https://user-images.githubusercontent.com/109237711/191102579-89f5260f-a990-45d3-bac9-836168db52ed.png)
 
@@ -42,15 +42,13 @@ e.g. if your sampling rate is 8.46hz, then set the FPS to 8.46 and value of T sh
 
 ![image](https://user-images.githubusercontent.com/81972652/193972751-314c8871-defc-4387-86ee-5be8a991a92d.png)
 
+This is the time window for rolling normalizatoin. If you have very large and long lasting responses I recommend a longer window like 800 seconds, but that will permit some drift on a faster time scale. 2-400 seconds could be ok. Basically the rule of thumb is that the window should be much larger than any event, e.g. if you have a response which lasts 30s you need at least 60 seconds of window as a bare minimum. Complex ongoing activity greatly benefits from a larger window.
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/0984c137-8c70-48f5-bc4b-9aa88f431b22)
 
-Normalization windows are dependent on sampling rate, but for 6-8hz these are a good starting point
-![image](https://user-images.githubusercontent.com/81972652/193972855-70325468-0fe8-415e-bf33-fcb836f21cb8.png)
-
-Baseline calcs will be changed later so retaining the first 2000 frames is good enough for now.
 
 ## ProcessData.py
 This script needs to be run before any other are ran. 
-This script imports raw data, normalize, smooth, then calculate the threshold for each ROI (0.5 or baselineMean+4*SD, whichever is bigger)
+This script imports raw data, normalize, smooth, then calculate the threshold for each ROI, the actual threshold of response can vary depending on your experiment. For cutaneous stimuli an amplitude of 0.2 and baselineMean+7xSD works fairly well, but then for pharmacologic stimuli a threshold o 0.3 seems to be more reasonable.
 
 If click "run" for this script, the script will run for one data file (ie. 1 plane) designated in constants.py. Alternatively, user can input commands in terminal to specify experiment number of plane number. Because multiple lines can be input at once, inputing commands in terminal is recommended if you want to process multiple planes at once.
 
@@ -65,7 +63,7 @@ Running the script will output 3 data files in OutputData folder:
 
 don't panic if the smoothed data seems 3 times larger in size than the original file! They have the exact same dimensions and number of cells, it's just that the numbers are stored differentl somehow, thus creating different sizes.
 
-Currently, don't trust AllThresholds too much because it establishes threshold for the entire recording based on the first 2000 frames (or however huch you input in constants.py), which does not account for slow drifts during the experiments.
+For thresholds, if you want each stimulus to have a distinct threshold, you're finished. But I prefer to have them the same for all stimuli so I go through the CSV and take the median value of the thresholds and copy them to all stimuli.
 
 Once your variables are changed in the constant.py file, save it and open the Unit Test.txt doc in VScode (or whatever). Open a new terminal and CD to  E:\#462\PythonScripts>  (or however you've named it) and then run either one or all of the planes as described. 
 python ProcessData.py "#462" "P0"
