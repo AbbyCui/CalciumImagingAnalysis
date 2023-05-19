@@ -18,6 +18,10 @@ Inside the stimulus file, columm 1 is the name of each stimuli. **Do no include 
 
 ![image](https://user-images.githubusercontent.com/109237711/191102579-89f5260f-a990-45d3-bac9-836168db52ed.png)
 
+Inside the Threshold file you can mark which of the stimulations to include for the calculation of the Median threshold as well as mark which thresholds to set to the pharmthreshold.
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/42b90823-8c9b-448f-89fc-47684dcd9d19)
+
+
 Valid colors are listed here for reference:
 https://matplotlib.org/stable/gallery/color/named_colors.html
 
