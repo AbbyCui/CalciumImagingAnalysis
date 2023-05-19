@@ -12,13 +12,14 @@ For EACH experiment, make a copy of the folder PythonScripts and place it within
 
 Then create a folder called the same thing (Exp#462) and within it create a folder called "Data" that contains all results from multi-measure and a .csv file containing the timestamp of each stimuli. Results should be in csv format, and names as **"experiemntNumber_PlaneNumber_Results.csv"**, and stimulus file should be named **"ExperimentNumber_Stimulus.csv"**, as shown below. The names of the ROIs (i.e. the first row) cannot have # in it, e.g. Exp#455_P2_001 and should be left as Mean1, Mean2, etc as the outputs will be renamed later.
 
-![image](https://user-images.githubusercontent.com/81972652/193972095-c63ea7de-ea6e-4dda-ae69-8981fde2ee41.png)
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/3bd42cb4-339e-49d4-8b92-307d17e40546)
 
 Inside the stimulus file, columm 1 is the name of each stimuli. **Do no include commas or #!** comma in csv files indicate "next cell" and will not be interpreted as a part of the text. The second and the third columns are the start and end of each stimulus (in frames). Fourth column is optional, and can be used to indicate the color you want the stimulus to be during plotting. If nothing is entered, all stimuli will be defult to grey. If you ever have weird errors e.g. blanks values being imported copy the 4 columns and x rows into a new CSV and save it. I've had it happen once or twice that there must have been some extraneous blank cells included in the CSV when excel saved.
 
 ![image](https://user-images.githubusercontent.com/109237711/191102579-89f5260f-a990-45d3-bac9-836168db52ed.png)
 
 Inside the Threshold file you can mark which of the stimulations to include for the calculation of the Median threshold as well as mark which thresholds to set to the pharmthreshold.
+
 ![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/42b90823-8c9b-448f-89fc-47684dcd9d19)
 
 
