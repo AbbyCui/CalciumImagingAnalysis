@@ -358,14 +358,52 @@ def getAllThresholds(debug,data,stim,fps,threshold):
         if debug:
             print("stimName",stimName)
 
-    # Temporary fix: make all stimThreshold the same for the same ROI
-    # the ROI's threshold = median of all stimThresholds for this ROI
     if constant.varyingThreshold==False:
-        for i in range (0,ys):
-            ROIthreshold = np.median(AllThresholds[1:,i+1])
-            AllThresholds[1:,i+1] = ROIthreshold
+        if constant.debugCSV:
+            np.savetxt(constant.pathToOutputData + "IndividualThresholds (no plane number).csv", AllThresholds, delimiter=',', comments='', fmt='%s') ##saving the non-median'd thresholds for reference
+        ThresholdFilt = np.loadtxt(constant.pathToData +"Threshold.csv",delimiter=',',dtype=str) ##import the file for which thresholds to use
+        temp=ThresholdFilt[0:,1] #take all the values from the 2nd column which contains which stims to include for median
+        RowsToIncludeForMedian = [i for i, row in enumerate(temp) if '1' in row] ##report which rows (from 0 to end) have a 1, e.g. which to include
+        if debug:
+            print(RowsToIncludeForMedian)
+        FilteredThresholds = AllThresholds[0,0:] #create new threshold array in which to place the thresholds post ROI removal
+        if debug:
+            print("ThresholdFilt Shape",ThresholdFilt.shape)
+            print("y,x",y,x)
+
+        for MStim in range(1,(ys+1)): #skip the 0th row because it's the names 
+            if MStim in RowsToIncludeForMedian:
+                if debug:
+                    print("Stimulus Number:",MStim)
+                    print("Stimulus Name",ThresholdFilt[MStim,0])
+                thisgoodthreshold = AllThresholds[MStim,0:] #take the ROIth column in the data sheet
+                if debug:
+                    print("shape of this goodthreshold",thisgoodthreshold.shape)
+                FilteredThresholds = np.vstack((FilteredThresholds,thisgoodthreshold)) #stack on top
+                if debug:
+                    print("filtered thresholds shape",FilteredThresholds.shape)
+        if constant.debugCSV:
+            np.savetxt(constant.pathToOutputData + "FilteredThresholds(no plane number).csv", FilteredThresholds, delimiter=',', comments='', fmt='%s') ##saving the non-median'd thresholds for reference
+        for i in range (1,x):
+            ROIthreshold = np.median(FilteredThresholds[1:,i])
+            AllThresholds[1:,i] = ROIthreshold
             if debug:
                 print("varying threshold = False")
+        ##part 2 which involves setting the Pharmacology to a minimum of 0.3 (or whatever is set)
+        temp=ThresholdFilt[0:,2] #take all the values from the 2nd column which contains which stims to include for median
+        RowsToIncludeForPharm = [i for i, row in enumerate(temp) if '1' in row] ##report which rows (from 0 to end) have a 1, e.g. which to include
+        if debug:
+            print(RowsToIncludeForPharm)
+        for MStim in range(1,(ys+1)): ##skip the 0th row because it's the names 
+            if MStim in RowsToIncludeForPharm:
+                for i in range(1,x):
+                    thisThreshold = AllThresholds[MStim,i]
+                    if thisThreshold<0.3:
+                        AllThresholds[MStim,i]=constant.pharmthreshold
+                if debug:
+                    print("shape of temp",temp.shape)
+        if debug:
+            print(RowsToIncludeForPharm)
     return AllThresholds
     
 def extractEvent(debug,data,stim,AllThresholds):
@@ -398,10 +436,7 @@ def extractEvent(debug,data,stim,AllThresholds):
     
     if constant.debugCSV:
         np.savetxt(constant.pathToOutputData + "DoubleSmoothedForSpikeEnds (lacks plane number).csv", doublesmoothed, delimiter=',', comments='', fmt='%s')
-
-#    doublesmoothed[...,0] = data[...,0] ##adding  the first column - frame number
-#    doublesmoothed[0,...] = data[0,...] #adding back the first row - ROIs 
-    
+   
     spikesInOnes = np.zeros_like(data)
     spikesInOnes[...,0] = data[...,0] ##adding  the first column - frame number
     spikesInOnes[0,...] = data[0,...] #adding back the first row - ROIs 
