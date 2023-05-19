@@ -10,7 +10,8 @@ import numpy as np
 debug = False
 debugCSV = False ##this is just outputting the various other CSVs for debugging or checking, e.g. Event Start and Stop Times, good/bad thresholds, etc
 #set varyingThreshold to have different threshold for each stimuli for each ROI (e.g. 3 ROI x 5 stimuli = 15 different thresholdds)
-varyingThreshold = True ##set to True to skip median determination of thresholds
+varyingThreshold = False ##set to True to have each stimulation have it's own distinct threshold (not recommended)
+pharmthreshold = 0.3 ##this is a secondary threshold which you can use to differentiate cutaneous vs pharmacological stimuli
 # signal above threshold are considered an event
 threshold = 0.2
 ##Threshold for SD 
@@ -26,10 +27,10 @@ DO_AUC=True
 AUC_norm=False ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
 
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
-parentFolder = "#462"
+parentFolder = "#468"
 
 #Frame per second for the experiment (used only in Plot.py)
-fps = 8.4
+fps = 7.4
 # sample spacing
 T = 1.0 / fps # 8Hz
 
