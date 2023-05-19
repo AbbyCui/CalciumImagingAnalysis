@@ -43,9 +43,30 @@ splPATH = pathToOutputData + splPrefix
 smoothed = np.loadtxt(splPATH +"Smoothed.csv",delimiter=',',dtype=str)
 smoothed = Utility.extractData(debug, smoothed, ROIsToRemove = ROIsToRemove, stimStart = stimStart, stimEnd = stimEnd)
 stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols = (0,1,2,3))
+
 AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",delimiter=',',dtype=str)
+y,x = AllThresholds.shape
+GoodThresholds = AllThresholds[0:,0] #create new threshold array in which to place the thresholds post ROI removal
+ROInames = ["Frame",] #initiate new empty array
 if debug:
-        print("post extractData stimStart=",stimStart,"stimEnd=",stimEnd)
+    print("AllThresholds Shape",AllThresholds.shape)
+    print("y,x",y,x)
+
+for ROI in range(1,x): #skip the 0th row because it's the names 
+    if ROI not in ROIsToRemove:
+        if debug:
+            print("ROI",ROI)
+            print("Allthresholds",AllThresholds[0:,ROI])
+        thisgoodthreshold = AllThresholds[0:,ROI] #take the ROIth column in the data sheet
+        if debug:
+            print(thisgoodthreshold.shape)
+        GoodThresholds = np.vstack((GoodThresholds,thisgoodthreshold)) #stack on top
+        if debug:
+            print("ROIname",ROIname)
+    else:
+        if debug:
+            print("ROI in ROIsToRemove",ROI)
+AllThresholds = GoodThresholds.T #correct the axis of the data -> one colum for each ROI
 
 TotalTime = smoothed.shape[0]-1
 TotalROIs = smoothed.shape[1]-1
