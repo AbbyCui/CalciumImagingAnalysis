@@ -47,7 +47,8 @@ e.g. if your sampling rate is 8.46hz, then set the FPS to 8.46 and value of T sh
 
 ![image](https://user-images.githubusercontent.com/81972652/193972751-314c8871-defc-4387-86ee-5be8a991a92d.png)
 
-This is the time window for rolling normalizatoin. If you have very large and long lasting responses I recommend a longer window like 800 seconds, but that will permit some drift on a faster time scale. 2-400 seconds could be ok. Basically the rule of thumb is that the window should be much larger than any event, e.g. if you have a response which lasts 30s you need at least 60 seconds of window as a bare minimum. Complex ongoing activity greatly benefits from a larger window.
+This is the time window for rolling normalizatoin. If you have very large and long lasting responses I recommend a longer window like 800 seconds, but that will permit some drift on a faster time scale. 2-400 seconds is generally ok, but for things like GRP without TTX 400 is better. Basically the rule of thumb is that the window should be much larger than any event, e.g. if you have a response which lasts 30s you need at least 60 seconds of window as a bare minimum. Complex ongoing activity greatly benefits from a larger window.
+
 ![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/0984c137-8c70-48f5-bc4b-9aa88f431b22)
 
 
