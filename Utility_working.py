@@ -486,7 +486,9 @@ def extractEvent(debug,data,stim,AllThresholds):
                                 if debug:
                                     print("maxvalue is being overwritten as",maxvalue)
                     except:
-                        print("reached the first or the last row or a major error has occured")
+                        print("reached the first or the last row, this has something to do with stims being active at the first frame. Otherwise it might be supressing a silent error.")
+                        print("ith stim is",s,"time",y,"x",x,"thisthresh",thisThreshold)
+                        print("Start is assigned at Current frame",y,"prior frame is a 0",maxvalue,"at ROI/column",x)
                     # if the prior frame doesn't exist, then this is the first row/frame
                     # if this value is smaller than threshold
                     try:
