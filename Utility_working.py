@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import signal
+from scipy import stats
 from numpy import trapz
 from pandas import array, DataFrame, cut
 import statistics
@@ -151,6 +152,12 @@ def normalize(debug, data, window, percentile):
     fb=np.ones_like(rawdata)
     fbtemp=np.ones_like(rawdata[...,0])
     f = 0
+
+    if constant.percentile=="mode":
+            print("Mode normaliation enabled")
+    else:
+        print("Rolling normalization enabled. Percentile is:", constant.percentile)
+
     while f<(TotalROIs):
         #print out ROI number for every 10 ROIs
         if debug and f%10 == 0:
@@ -158,23 +165,31 @@ def normalize(debug, data, window, percentile):
         halfwindow=int(window/2)
         i=halfwindow
         raw = rawdata[...,f]
-        while i<(len(raw)-window):
-            aslice=raw[(i-(halfwindow)):(i+(halfwindow))]
+        if constant.percentile=="mode":
+            roundedarray=np.around(raw, decimals=0) ##this rounds the floating points to a bin of 1 (basically an integer) to find the most common value. 0.5 was a bit peaky, so 1 worked
+            mode_result =stats.mode(roundedarray,axis=None, keepdims=True) ##find the most common value in the ROI
+            thismode=mode_result.mode
+            fbtemp[:]=thismode ##assign the mode to each baseline 
+            if debug:
+                print("value of fbtemp",fbtemp[1])
+        else:
+            while i<(len(raw)-window):
+                aslice=raw[(i-(halfwindow)):(i+(halfwindow))]
 
-            fbtemp[i]=(np.percentile(aslice, percentile)) ##arrayname, percentile between 0-100
-            if i==(len(raw)-window-1):
-                temp=(np.percentile(aslice, percentile)) ##arrayname, percentile between 0-100
-                ii=1
-                while ii<(window+1):
-                    fbtemp[i+ii]=temp
-                    ii+=1
-                iii=0
-                while iii<(halfwindow):
-                    aslice=raw[1:window]
-                    temp=(np.percentile(aslice, percentile))
-                    fbtemp[iii]=temp
-                    iii+=1
-            i+=1
+                fbtemp[i]=(np.percentile(aslice, percentile)) ##arrayname, percentile between 0-100
+                if i==(len(raw)-window-1):
+                    temp=(np.percentile(aslice, percentile)) ##arrayname, percentile between 0-100
+                    ii=1
+                    while ii<(window+1):
+                        fbtemp[i+ii]=temp
+                        ii+=1
+                    iii=0
+                    while iii<(halfwindow):
+                        aslice=raw[1:window]
+                        temp=(np.percentile(aslice, percentile))
+                        fbtemp[iii]=temp
+                        iii+=1
+                i+=1
         fb[...,f]=fbtemp
         f+=1
     if debug:
