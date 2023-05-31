@@ -19,7 +19,7 @@ SD=7
 ##Output a third sheet which contains the max amp of all stims regardless of threshold (mostly for finding/validating thresholds)
 MaxAll=True
 ##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
-ThresholdsOnly=1
+ThresholdsOnly=0
 
 ##This uses the Events (starts/stops) to find events and then only calculates AUC of the detected events
 #of note, the AUC will be limited to the stimwindow, i.e. if the decay/calcium lasts longer than the window it will underestimate the AUC
@@ -27,7 +27,7 @@ DO_AUC=True
 AUC_norm=False ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
 
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
-parentFolder = "#468"
+parentFolder = "#471"
 
 #Frame per second for the experiment (used only in Plot.py)
 fps = 7.4
@@ -36,10 +36,10 @@ T = 1.0 / fps # 8Hz
 
 #window for normalization
 #For a normal recording ~3-400 seconds is fine. For things that last a long time or have prolonged elevations in calcium (4880/GRP) 800 seconds or more seems to be necessary.
-timewindow = 800 #This is in seconds
+timewindow = 2500 #This is in seconds
 window = (round(timewindow*fps)) #This converts the seconds to frames
 #percentile of window for normalization
-percentile=30 ##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. 
+percentile=30 ##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. Can also be set to "mode" for non-rolling normalization
 
 #window size for smoothing
 # this is the window in which the polynomial fits. Larger numbers are more smooth, 
