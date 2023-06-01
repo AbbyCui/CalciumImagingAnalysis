@@ -43,30 +43,9 @@ splPATH = pathToOutputData + splPrefix
 smoothed = np.loadtxt(splPATH +"Smoothed.csv",delimiter=',',dtype=str)
 smoothed = Utility.extractData(debug, smoothed, ROIsToRemove = ROIsToRemove, stimStart = stimStart, stimEnd = stimEnd)
 stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols = (0,1,2,3))
-
 AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",delimiter=',',dtype=str)
-y,x = AllThresholds.shape
-GoodThresholds = AllThresholds[0:,0] #create new threshold array in which to place the thresholds post ROI removal
-ROInames = ["Frame",] #initiate new empty array
 if debug:
-    print("AllThresholds Shape",AllThresholds.shape)
-    print("y,x",y,x)
-
-for ROI in range(1,x): #skip the 0th row because it's the names 
-    if ROI not in ROIsToRemove:
-        if debug:
-            print("ROI",ROI)
-            print("Allthresholds",AllThresholds[0:,ROI])
-        thisgoodthreshold = AllThresholds[0:,ROI] #take the ROIth column in the data sheet
-        if debug:
-            print(thisgoodthreshold.shape)
-        GoodThresholds = np.vstack((GoodThresholds,thisgoodthreshold)) #stack on top
-        if debug:
-            print("ROIname",ROIname)
-    else:
-        if debug:
-            print("ROI in ROIsToRemove",ROI)
-AllThresholds = GoodThresholds.T #correct the axis of the data -> one colum for each ROI
+        print("post extractData stimStart=",stimStart,"stimEnd=",stimEnd)
 
 TotalTime = smoothed.shape[0]-1
 TotalROIs = smoothed.shape[1]-1
@@ -94,6 +73,8 @@ print("plotting experiment ",expNumber, "plane ",planeNumber,"with ",ROIsmoothed
 # range(x,y) -> [x,y), so end has to be len(ROI)+1 to include the last ROI
 for i in range(1,len(ROIs)+1):
     ROI = str(ROIs[i-1])[4:]
+    ROInumber = int(ROI)
+    ROInumber = f'{ROInumber:03d}'
     rawSmoothed = ROIsmoothed[1:,i].astype(float,copy=False)
 
     fig = plt.figure() 
@@ -111,7 +92,7 @@ for i in range(1,len(ROIs)+1):
         figsize=1
         print("X-axis too small, increase range or the seconds/inch")
     fig.set_size_inches(figsize, 7)
-    plt.title(expNumber + " "+planeNumber +" ROI=" + ROI, loc='center', y=.9)
+    plt.title(expNumber + "_"+planeNumber +"_ROI" + ROInumber, loc='center', y=.9)
     plt.xlabel("Time (sec)")
     plt.plot(np.arange(stimStart, stimEnd, step = 1)/fps,rawSmoothed,linewidth=1)
     plt.tight_layout()
@@ -158,7 +139,7 @@ for i in range(1,len(ROIs)+1):
             plt.axhline (y = thisThreshold, xmin =percentStart, xmax =percentEnd, color='red', linewidth = 1 )
             plt.text(start, (yaxismax), stimName, rotation=-45, fontsize=12, wrap=False, ha='right')
 
-    plt.savefig(pathToFigure + expNumber+"_" + planeNumber + "_ROI" + ROI + "_"+str(stimStart) + "-" + str(stimEnd) + ".png", dpi=300)
+    plt.savefig(pathToFigure + expNumber+"_" + planeNumber + "_ROI" + ROInumber + "-"+str(stimStart) + "-" + str(stimEnd) + ".png", dpi=300)
     plt.grid()
     # plt.show()
     plt.close("all")
