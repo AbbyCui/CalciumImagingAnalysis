@@ -1,5 +1,7 @@
 import numpy as np
 from scipy import signal
+import matplotlib.pyplot as plt
+from numpy import trapz
 from pandas import array, DataFrame, cut
 import statistics
 import constant as constant
@@ -366,7 +368,7 @@ def getAllThresholds(debug,data,stim,fps,threshold):
             if debug:
                 print("varying threshold = False")
     return AllThresholds
-
+    
 def extractEvent(debug,data,stim,AllThresholds):
     """
     extract the start and end of each event, as well as a dataframe with 1s representing frames above threshold and 0s representing frames below threshold
@@ -375,78 +377,126 @@ def extractEvent(debug,data,stim,AllThresholds):
     also output spikesInOnes with the same dimensions and headers as data, but each value are mutated to 1 if the value is above threshold, or 0 if below
     """
     if debug:
-        print("----------extractEvent function----------")
+        print("----------eventCounter function----------")
 
     # spikeInOnes have the same dimensions and headers as data, but filled with zeros (below threshold) or ones (above threshold)
+   
+    doublesmoothed=np.zeros_like(data,dtype = float)
+    num_rows, num_cols = data.shape
+
+    if debug:
+        print("----------smooth function----------")
+        print("data input to smooth function has shape:", data.shape)
+        print("data type:", data.dtype)
+        print("data frames:", data[...,0])
+        print("data ROIs:", data[0,1:])
+
+    #loop through columns to smooth each ROI data
+    i=1
+    while i< num_cols: #loop for each ROI (except for the first column of frames)
+        doublesmoothed[1:,i] = signal.savgol_filter(data[1:,i],41, 2) # this is fairly aggresive smoothing for 8hz intended to smooth out any noise to use with the stops only
+        i+=1
+    
+    if constant.debugCSV:
+        np.savetxt(constant.pathToOutputData + "DoubleSmoothedForSpikeEnds (lacks plane number).csv", doublesmoothed, delimiter=',', comments='', fmt='%s')
+
+#    doublesmoothed[...,0] = data[...,0] ##adding  the first column - frame number
+#    doublesmoothed[0,...] = data[0,...] #adding back the first row - ROIs 
+    
     spikesInOnes = np.zeros_like(data)
     spikesInOnes[...,0] = data[...,0] ##adding  the first column - frame number
     spikesInOnes[0,...] = data[0,...] #adding back the first row - ROIs 
     ys,xs = data.shape
     stimNum = stim.shape[0]-1
     # startsAndEnds have the same dimensions and headers as data, but filled with tuples of (start,end) frame numbers for each event
-    Starts = np.empty_like(data,dtype = float)
-    Ends = np.empty_like(data,dtype = float)
-    FrAboveThreshold = np.empty_like(data,dtype = float)
-    MidSpike = np.empty_like(data,dtype = float)
+    Starts = np.zeros_like(data,dtype = float)
+    Ends = np.zeros_like(data,dtype = float)
     if debug:
         print("ys =",ys)
         print("xs =",xs)
         print("initialized spikesInOnes with the second row:",spikesInOnes[1,...])
     
     for x in range(1,xs): #for each ROI
+        lastend=0
         event = 0 #initialize event number as 0
-        s = 1 # initialize stimlus index as 1
+        s = 0 # initialize stimlus index as 1 *this was abby's code. I think it needs to be 0 because the stim array has no title so this is skipping the 1st stim row
         for y in range(1,ys): #for each frame in this ROI
-            thisData = float(data[y,x]) #extract raw data and change to float
-            #determine threshold based on which stimuli this current frame is in
-            for i in range(s,stimNum): #i-th stimulus
-                if y >= float(stim[i,1]) and y <= float(stim[i,2]):
-                    if debug and y%100 == 1:
-                        print("stimstart",float(stim[i,1]),y) 
-                    s = i
-                    break
-            thisThreshold = float(AllThresholds[s,x])
-
-            # find events 
-            if thisData>thisThreshold:
-                spikesInOnes[y,x] = 1
-                # if the prior frame is 0 (smaller than threshold)
-                try:
-                    if int(spikesInOnes[y-1,x]) == 0:
-                        start = y
-                # if the prior frame doesn't exist, then this is the first row/frame
-                except:
-                    if debug:
-                        print("reached the first or the last row")
-                # if this value is smaller than threshold
-                try:
-                    if float(data[y+1,x]) < thisThreshold: 
-                        end = y
-                        #if spike lasted for more than 4 [ or the variable spikeduration] (variable name) frames, count as an event
-                        if end-start >= constant.spikeduration:
-                        #after a spike ends, add start and finish to startsAndEnds as a tuple
-                            event += 1
-                            Starts[event,x] = start
-                            Ends[event,x] = end
-                            f = end-start
-                            FrAboveThreshold[event,x] = f
-                            mid = start+end/2
-                            MidSpike [event,x] = mid
-                            if debug and event  == 1:
-                                print("ROI",x,"has first event from",start,'to',end,'lasting',fm,'frames')
-                            #then reset start and end
-                            start = 0
-                            end = 0
-                except:
-                    if debug:
-                        print("reached the first or the last row")
+            lastend=np.max(Ends[:,x])
+            if y<=(lastend+1):##this needs to be plus one, because the y+1 was set as zero based on the smoothed data. Edge cases require this.
+                if debug:
+                    print("Skipping this frame: value of y",y," Value of Ends",lastend)
             else: 
-                spikesInOnes[y,x] = 0
- 
+                thisData = float(data[y,x]) #extract raw data and change to float
+                #determine threshold based on which stimuli this current frame is in
+                for i in range(s,stimNum):
+                    if y >= float(stim[i,1]) and y <= float(stim[i,2]):
+                        s = i
+                        break
+                st=s+1 #this needs to be +1 relative to the stim array as it contains the title row
+                thisThreshold = float(AllThresholds[st,x])
+                if debug:
+                    print("ith stim is",s,"time",y,"x",x,"thisthresh",thisThreshold)
+                # find events
+                if thisData>thisThreshold:
+                    spikesInOnes[y,x] = 1
+                    # if the prior frame is 0 (smaller than threshold)
+                    try:
+                        if int(spikesInOnes[y-1,x]) == 0:
+                            start = y
+                            maxvalue=thisData
+                            if debug:
+                                print("Start is assigned at Current frame",y,"prior frame is a 0",maxvalue,"at ROI/column",x)
+                        else:
+                            if thisData>maxvalue:
+                                maxvalue=thisData
+                                if debug:
+                                    print("maxvalue is being overwritten as",maxvalue)
+                    except:
+                        print("reached the first or the last row or a major error has occured")
+                    # if the prior frame doesn't exist, then this is the first row/frame
+                    # if this value is smaller than threshold
+                    try:
+                        if float(data[y+1,x]) < thisThreshold: ##if the next frame is expected to be a 0
+                            end = y
+                            #if spike lasted for more than 4 [ or the variable spikeduration] (variable name) frames, count as an event
+                            if end-start >= constant.spikeduration:
+                            #after a spike ends, add start and finish to startsAndEnds as a tuple
+                                varThreshold=max(thisThreshold*.6,.15)
+                                if float(doublesmoothed[y+1,x]) < varThreshold:
+                                    event += 1
+                                    Starts[event,x] = start
+                                    Ends[event,x] = end
+                                    spikesInOnes[y+1,x] = 0
+                                    #then reset start and end
+                                    #print("for frame=",y,"in column(ROI)",x,"final maxvalue for x5 or mean6",maxvalue)
+                                    start = 0
+                                    end = 0
+                                    maxvalue=0
+                                else:
+                                    while float(doublesmoothed[y+1,x]) > varThreshold:
+                                        spikesInOnes[y+1,x] = 1
+                                        end=y
+                                        y=y+1
+                                    else:
+                                        event += 1
+                                        Starts[event,x] = start
+                                        Ends[event,x] = end
+                                        #then reset start and end
+                                        #print("for frame=",y,"in column(ROI)",x,"final maxvalue for x5 or mean6",maxvalue)
+                                        spikesInOnes[y,x] = 0
+                                        spikesInOnes[y+1,x] = 0
+                                        start = 0
+                                        end = 0
+                                        maxvalue=0
+                    except:
+                        if debug:
+                            print("reached the first or the last row")
+                else: 
+                    spikesInOnes[y,x] = 0
     if debug:
         print("Starts has shape:",Starts.shape)
         print("Ends has shape:",Ends.shape)
-    return Starts, Ends, FrAboveThreshold,MidSpike
+    return Starts, Ends
    
 def eventCounter (debug, Starts):
     """
@@ -554,9 +604,7 @@ def getMaxResponse (debug,data,stimStart,stimEnd,Starts,Ends):
             start = int(Starts[j,i]) + dataStart
             end = int(Ends[j,i]) + dataStart
             # if this event occured during the stimulation window
-            if (start >= int(float(stimStart)) and start<= int(float(stimEnd))) or \
-            (end >= int(float(stimStart)) and end <= int(float(stimEnd))) or  \
-            (start<=int(float(stimStart))and end >=int(float(stimEnd))): 
+            if (start >= int(float(stimStart)) and start<= int(float(stimEnd))):
                 if debug:
                     print("current start and end:",start,end)
                 maxSignal = max(data[start:end+1,i])
@@ -649,7 +697,7 @@ def getMaxResponseAll (debug,data,stimStart,stimEnd,Starts,Ends):
         c+=1
     return MaxResponseAll
 
-def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
+def getAUCv0 (debug,data,stimStart,stimEnd,Starts,Ends):
     '''
     Get the AUC  of each ROIs for ONE stimulus with defined start and end
     Input: smoothed data, int for the start and the end of the stimulus,
@@ -686,3 +734,147 @@ def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
         c+=1
     return AUC
 
+def getAUC (debug,data,stimStart,stimEnd,Starts,Ends):
+    '''
+    Get the AUC  of each ROIs for ONE stimulus with defined start and end
+    Input: smoothed data, int for the start and the end of the stimulus,
+        and Starts and Ends dataframe with the starting and ending frames for each event
+    Output: AUC dataframe with 1 row, and the same number of columns the number of ROIs (no header)
+    '''
+    if debug:
+        print("----------getAUC function----------")
+    #get dimension of data
+    y,x = data.shape
+    stimwindow=(stimEnd-stimStart)
+    duration=(((stimwindow/constant.fps)/60)) ##this is in minutes
+    #get the starting frame of data
+    dataStart = int(float(data[1,0]))
+    #initialize AUCTotal with 2 rows, and the same number of columns as data
+    AUCTotal = np.zeros((1,x-1))
+    AvgAmplitude = np.zeros((1,x-1))
+    AvgEventWidth = np.zeros((1,x-1))
+    NumEvents = np.zeros((1,x-1))
+
+    # for each ROI
+    for i in range(1,x):
+        #if the last frame is above threshold, there will be more values in "starts" than "ends" for this ROI
+        numStart = np.count_nonzero(Starts[...,i])
+        numEnd = np.count_nonzero(Ends[...,i])
+
+        curr_NumEvents = 0
+        curr_AUC = 0.0
+        curr_AvgAmplitude = 0.0
+        curr_EventWidth = 0.0
+
+        # fill up starts and ends to give them the same lengths
+        if numStart > numEnd:
+            #if more starts than ends, add a value to ends = the last frame of the recording
+            Ends[numEnd+1,i] = data[y-1,0]
+        elif numEnd>numStart:
+            Starts[1,i] = 1
+        # for each event in Starts/Ends
+        for j in range (1,numStart+1):
+            start = int(Starts[j,i]) + dataStart
+            end = int(Ends[j,i]) + dataStart
+            # if this event occured during the stimulation window
+            ############Part1: checks for a start within the stim window and extracts the appropriate frames (i.e. those that occur during the window) into the array tdata
+            if (start >= int(float(stimStart)) and start<= int(float(stimEnd))): ## this changed from the typical as I only ever want to count each spike once (e.g. for back to back windows) so only the start is considered
+                if ((end-start)>(1500)): ## This makes sure that there aren't any weirdly long events (~>2 minutes long) that suggest a manual check of the data is necessary
+                    print("ROI",data[0,i],"has an event between frames",start,"and",end,"which lasts for more than 1500 frames, consider checking raw data")
+                if debug:
+                    print("current start and end:",start,end)
+                curr_NumEvents = curr_NumEvents+1
+                if (end >= int(float(stimEnd))):
+                    ##if the end of the event outlasts the stimwindow, only extract the stim window for analysis
+                    tdata=data[start:stimEnd+1,i]
+                    tdata = tdata.astype(float)
+                else:
+                    tdata=data[start:end+1,i]
+                    tdata = tdata.astype(float)
+                ##once the data is extracted, we evaluated the event and add it to the running total
+                area=trapz(tdata,dx=constant.T) ##this uses the trapezoid rule which is more accurate than a simple sum
+                curr_AUC = curr_AUC + area
+                curr_AvgAmplitude = curr_AvgAmplitude + max(tdata)
+                curr_EventWidth = curr_EventWidth + (len(tdata))
+            ###########Part2: if there is no start that occurs within the window, it now checks for an end which occurs within the stimwindow
+            else:
+                if (end >= int(float(stimStart)) and end <= int(float(stimEnd))):
+                    tdata=data[stimStart:end+1,i]
+                    tdata = tdata.astype(float)
+                    curr_NumEvents = curr_NumEvents+1
+                    ##evalute the extracted data
+                    area=trapz(tdata,dx=constant.T) ##this uses the trapezoid rule which is more accurate than a simple sum
+                    curr_AUC = curr_AUC + area
+                    curr_AvgAmplitude = curr_AvgAmplitude + max(tdata)
+                    curr_EventWidth = curr_EventWidth + (len(tdata))
+                else:
+                    if (start <= int(float(stimStart)) and end>= int(float(stimEnd))):
+                        print("start/stop pair lasts longer than the duration of the stim window for ROI",data[0,i],"at frames",start,"and",end)
+                        tdata=data[stimStart:stimEnd+1,i]
+                        tdata = tdata.astype(float)
+                        curr_NumEvents = curr_NumEvents+1
+                        ##evalute the extracted data
+                        area=trapz(tdata,dx=constant.T) ##this uses the trapezoid rule which is more accurate than a simple sum
+                        curr_AUC = curr_AUC + area
+                        curr_AvgAmplitude = curr_AvgAmplitude + max(tdata)
+                        curr_EventWidth = curr_EventWidth + (len(tdata))
+            if debug:
+                print("curr_AvgAmplitude=",curr_AvgAmplitude)
+                print("curr_AUC =",curr_AUC)
+                
+
+        if(constant.AUC_norm==True):
+            curr_AUC = ((curr_AUC)/duration) ##this give AUC per minute
+        else: curr_AUC = (curr_AUC)
+        if curr_NumEvents==0:
+            curr_AvgAmplitude=0
+        else: curr_AvgAmplitude = curr_AvgAmplitude/curr_NumEvents
+        if curr_NumEvents==0:
+            curr_EventWidth=0
+        else:curr_EventWidth = ((curr_EventWidth/curr_NumEvents)*constant.T)
+
+        AUCTotal[0,i-1] = curr_AUC
+        NumEvents[0,i-1] = curr_NumEvents
+        AvgAmplitude[0,i-1] = curr_AvgAmplitude
+        AvgEventWidth[0,i-1] = curr_EventWidth
+
+    return AUCTotal,NumEvents,AvgAmplitude,AvgEventWidth
+
+def getISIstat(debug,st):
+
+    isi = st.diff() # diff between every 2 consequtive elements in st
+    isi = isi.to_numpy()
+    X = [i for i in isi if i > 0] #remove 0
+
+    # X contains arrays inside of a list
+    # the for-loop here flattens the arrays
+    x = []
+    for sublist in X:
+        for num in sublist:
+            x.append(num)
+    
+    if len(x)<=2: # only calculate if >=3 spikes after GRP application
+        median = -1
+        std = -1
+    else:
+        x1 = x[1:] #remove the first ISI
+        median = np.median(x1)
+        std = np.std(x1)
+        
+        x2 = [i for i in x1 if i <median+2*std and i>median-2*std] #exclude isi that are 2sd away from median
+        if debug:
+            print('st',st,'\n isi',x1,'\n isi after threshold',x2)
+            plotISIstats(x1,median,std)
+        median = np.median(x2)
+        std = np.std(x2)
+
+    return median,std
+
+def plotISIstats(x,median,std):
+    plt.hist(x,bins = 20)  # density=False would make counts
+    plt.axvline(x = median, color = 'b', label = 'median')
+    plt.axvline(x = median+2*std, color = 'r',label = '2std above median')
+    plt.axvline(x = median-2*std, color = 'r')
+    plt.ylabel('Count')
+    plt.xlabel('ISI')
+    plt.show()
