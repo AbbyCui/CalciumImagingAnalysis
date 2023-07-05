@@ -599,7 +599,8 @@ def getEventAmp(debug,data,Starts,Ends):
     #initialize eventAmp
     eventAmp = np.zeros_like(data,dtype = float)
     # for each ROI
-    for i in range(1,x):
+    print("x=",x)
+    for i in range(1,x-1):
         #if the last frame is above threshold, there will be more values in "starts" than "ends" for this ROI
         numStart = np.count_nonzero(Starts[...,i])
         numEnd = np.count_nonzero(Ends[...,i])

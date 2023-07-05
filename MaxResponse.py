@@ -76,10 +76,13 @@ stimNum = stimulus.shape[0]
 #extract only the desired ROIs (extract all frames)
 ROIdata = Utility.extractData(debug, data, ROIs, ROIsToRemove, stimStart = 1, stimEnd = "all") 
 Starts,Ends = Utility.extractEvent(debug, ROIdata, stimulus, AllThresholds)
+EventAmp = Utility.getEventAmp(debug,ROIdata,Starts,Ends)
 ROInum = ROIdata.shape[1]-1
 if debugCSV:
     np.savetxt(pathToOutputData + splPrefix + "starts.csv", Starts, delimiter=',', comments='', fmt='%s')
     np.savetxt(pathToOutputData + splPrefix + "ends.csv", Ends, delimiter=',', comments='', fmt='%s')
+    np.savetxt(pathToOutputData + splPrefix + "EventAmp.csv", EventAmp, delimiter=',', comments='', fmt='%s')
+    np.savetxt(pathToOutputData + splPrefix + "ROInames.csv", ROInames, delimiter=',', comments='', fmt='%s')
 
 #initialize maxResponse with the same number of rows as stimulus, 
 # but the number of columns as number of ROI
