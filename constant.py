@@ -27,25 +27,27 @@ DO_AUC=True
 AUC_norm=False ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
 
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
-parentFolder = "#471"
+parentFolder = "#492"
 
 #Frame per second for the experiment (used only in Plot.py)
-fps = 7.4
+fps = 7.46
 # sample spacing
 T = 1.0 / fps # 8Hz
 
 #window for normalization
 #For a normal recording ~3-400 seconds is fine. For things that last a long time or have prolonged elevations in calcium (4880/GRP) 800 seconds or more seems to be necessary.
-timewindow = 2500 #This is in seconds
+timewindow = 400 #This is in seconds
 window = (round(timewindow*fps)) #This converts the seconds to frames
 #percentile of window for normalization
-percentile=30 ##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. Can also be set to "mode" for non-rolling normalization
+percentile=40 ##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. 
+splitnorm=1 ##function to normalize individual recordings to help with changes in brightness between sessions 
+
 
 #window size for smoothing
 # this is the window in which the polynomial fits. Larger numbers are more smooth, 
 # but can decrease the height of transient peaks. Choose something on the same scale as your events, 
 # e.g. if a transient peak lasts around 30 frames, 15 is a good starting point.
-window_size = 9
+window_size = 15
 #polynomial order for smoothing
 #this is the order of polynomial used for smoothing. 
 # Bigger numbers fit the curve more closely (i.e. less smooth, but more accurate)
