@@ -28,7 +28,54 @@ stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols
 
 #normalize and smooth data
 if(ThresholdsOnly==0):
-    normalized = Utility.normalize(debug, data, window = window, percentile = percentile)
+    if(splitnorm==1):
+        splits = np.loadtxt(pathToData +"Splits.csv",delimiter=',',dtype=int,usecols = (0))
+        numsplits=(len(splits)-1)
+        i=0
+        rawdata = data[1:,1:] #only the data, excluding ROInames and frames 
+        ###remember that these are now starting at 0 and the list of splits runs from the 1st frame not the 0th###
+        rawdata = rawdata.astype(float, copy=False)    
+        ROInames = data[0,1:]
+        TotalROIs = len(ROInames)
+        while i < numsplits:
+            start=((splits[i]-1))
+            end=((splits[i+1])-1)
+            if i==((numsplits-1)): ##This is to include the last frame
+                end=end+1
+            if debug:
+                print(start)
+                print(end)
+
+            splitdata=rawdata[start:end,0:]
+            dff = Utility.normalizesplits(debug, splitdata, window = window, percentile = percentile, TotalROIs = TotalROIs)
+            if i==0:
+                splitDFF=dff
+            else:
+                splitDFF=np.vstack((splitDFF,dff))
+            #SplitDFF=SplitDFF.astype(str, copy=True)
+            #dff=dff.astype(str, copy=True)
+            if debug:
+                print(dff.shape)
+                print(splitDFF.shape)
+                print('splitDFF has shape of', splitDFF.shape)
+                prefix = pathToOutputData + splPrefix
+                np.savetxt(prefix + "splitdatanormalizedall.csv", splitDFF, delimiter=',', comments='', fmt='%s')
+            i+=1
+        normalized=splitDFF
+
+        ##add back the ROI names and frames
+        a = np.ones_like(data[1:,...])
+        a[...,0]=data[1:,0] ##copy the X-axis into a column (frames)
+        a[...,1:] = normalized ##copy the normalized array into the new array with the x axis
+        normalized=a.astype(str, copy=True) ##convert array to string so that it can support text names
+        titles = np.insert(ROInames,0,"Frame") 
+        normalized[0,...] = titles #insert ROI names into the string np
+       
+        if debug:
+            print("dffT has shape:", normalized.shape)
+            print("ROI names after normalization:", normalized[...,0])
+    else: 
+        normalized = Utility.normalize(debug, data, window = window, percentile = percentile)
     smoothed = Utility.smooth(debug, normalized,window_size,polynomial)
 
 # if already have smoothed data, and just want to re-run getAllTHreshods
