@@ -130,6 +130,89 @@ def extractData (debug, data, ROIs = "all", ROIsToRemove = [], stimStart = 0, st
 
     return output 
 
+def normalizesplits(debug, data, window, percentile, TotalROIs):
+    """
+    Normalizes data along splits, e.g. there are specified locations where the normalization resets.
+    input data set (array) with only numbers and no first column for time or row for name.  window, and percentile of normalization
+    returns array of normalized data
+    """
+    if debug:
+        print("----------normalize function----------")
+        print("data input to normalize has shape:",data.shape)
+        print("data input to normalize has the first row as:",data[...,0])
+    rawdata = data ##I'm only doing this so I don'y have to change the variaible name below. It's after midnight, sue me.
+
+    if debug:
+        print("ROInames =",ROInames)
+        
+    #initialize fb, fbtemp and index f
+    fb=np.ones_like(rawdata)
+    fbtemp=np.ones_like(rawdata[...,0])
+    f = 0
+
+    if constant.percentile=="mode":
+            print("Mode normaliation enabled")
+    else:
+        print("Rolling normalization enabled. Percentile is:", constant.percentile)
+
+    while f<(TotalROIs):
+        #print out ROI number for every 10 ROIs
+        if debug and f%10 == 0:
+            print("normalizing ROI",f)
+        flag=0
+        halfwindow=int(window/2)
+        i=halfwindow
+        raw = rawdata[...,f]
+        if constant.percentile=="mode":
+            roundedarray=np.around(raw, decimals=0) ##this rounds the floating points to a bin of 1 (basically an integer) to find the most common value. 0.5 was a bit peaky, so 1 worked
+            mode_result =stats.mode(roundedarray,axis=None, keepdims=True) ##find the most common value in the ROI
+            thismode=mode_result.mode
+            fbtemp[:]=thismode ##assign the mode to each baseline 
+            if debug:
+                print("value of fbtemp",fbtemp[1])
+        else:
+            if i>(len(raw)-window):
+                flag=1
+                roundedarray=np.around(raw, decimals=0) ##this rounds the floating points to a bin of 1 (basically an integer) to find the most common value. 0.5 was a bit peaky, so 1 worked
+                mode_result =stats.mode(roundedarray,axis=None, keepdims=True) ##find the most common value in the ROI
+                thismode=mode_result.mode
+                fbtemp[:]=thismode ##assign the mode to each baseline 
+                if debug:
+                    print("value of fbtemp",fbtemp[1])
+            else:
+                while i<(len(raw)-window):## starting a half a window, do it until it reaches 1/2 window away from the end
+                    aslice=raw[(i-(halfwindow)):(i+(halfwindow))] ##grab the window range centered around i
+                    fbtemp[i]=(np.percentile(aslice, percentile)) ##grab the percentile of i and assign it the ith spot in fbtemp
+                    if i==(len(raw)-window-1): ##as the rolling appraoches the end, we run out of new array to sample to percentile
+                        temp=(np.percentile(aslice, percentile)) ##assign the last percentile found
+                        ii=1
+                        while ii<(window+1):
+                            fbtemp[i+ii]=temp ##assign the last one to the remaining slots (i.e. the last window will be static)
+                            ii+=1
+                        iii=0
+                        while iii<(halfwindow): ##now go back to the start and fill in the empty half window
+                            aslice=raw[1:window] ##grab the 1:window legnth and use that as a static subtraction for the start
+                            temp=(np.percentile(aslice, percentile))
+                            fbtemp[iii]=temp
+                            iii+=1
+                    i+=1
+        fb[...,f]=fbtemp
+        f+=1
+    if debug:
+        print("data has shape:",rawdata.shape)
+        print("fb has shape:",fb.shape)
+
+    fb=fb.astype(float, copy=False)
+    rawdata=rawdata.astype(float, copy=False)
+    df=np.subtract(rawdata,fb)
+    dff=np.divide(df,fb)
+    if debug:
+        print("the shape of the normalized data is:", dff.shape)
+        print("ROI names after normalization:", dff[...,0])
+    if flag>0:
+        print('normalization window is too large to normalize this split. Switching to Mode Normalization')
+    return dff
+
 def normalize(debug, data, window, percentile):
     """
     Normalizes data
