@@ -129,3 +129,26 @@ You should only run this from the terminal with the following command
 ```
 python StitchFiles.py "#462" "MaxResponse"
 ```
+
+## Rename20xAvg.py and TemplateMatching.py
+Rename20xAvg.py performs 20x average on input csv and rename the ROI names from 'Mean34' to 'exp465_P0_034'. This script produces one output csv file for each plane.
+You should input experiment number and which planes you'd like to perform 20x avg at the beginning of the script. Also make sure to change all paths to input and output folder.
+
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/8cfb5b27-a56c-4f96-ac62-3c22a570d31d)
+
+TemplateMatching.py takes in a csv file with only the header (first row containing ROI names for the desired ROIs) as template. This file can contain ROIs from different planes.
+
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/192f6641-776d-45bf-965c-396d9dba1ef5)
+
+this script also takes in the smoothed (or 20x averaged smoothed).csv for all of the planes that contain the desired ROIs
+
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/797e6cc2-6501-47a6-bcd9-697f451f3c1c)
+
+then will output a csv containing the smoothed/20x smoothed data points for each selected ROIs. This will output one csv file for each template file.
+
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/edccc02f-044d-44fd-b42a-764337e679cf)
+
+You'll have to specify some parameters, and also make sure to specify output file path at the end of the script
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/61777628-d197-4e2f-870b-abd3d64a2877)
+
+
