@@ -8,7 +8,7 @@ import os
 
 #enter parameters
 exp = str(465)
-planeRange = range(1,5) #range(1,5) iterates over plane 1,2,3,4
+planeRange = range(1,2) #range(1,5) iterates over plane 1,2,3,4
 
 ####
 ROIsToRemove = np.zeros((1,1))
@@ -31,14 +31,18 @@ for p in planeRange:
 
     #change ROI name to format such as exp465_P0_ROI002
     head=f[0,...]
-    outhead = np.empty_like(head)
+    print('shape=',head.shape)
+    outhead = np.full_like(head,"12345678901234")
     for i in range(len(head)):
         thishead = head[i]
         a = thishead.replace('Mean','')
         a = a.zfill(3)
-        a = 'exp'+filename+"_ROI"+a
-        outhead[i] = a
+        # outhead[i] = 'exp'+filename+"_ROI"+a
+        print('outhead before:',outhead[i])
+        outhead[i] = 'x'+filename+"R"+a
+        print('outhead:',outhead[i])
     out[0,...] = outhead
-    np.savetxt("D:/DATA/Calcium Oscillation Data/Figures and source data/4880 CICADA response/#"+filename+"_20x avg_test.csv",out, delimiter=',', comments='', fmt='%s')
+    print('changed header:',head[1],'to',outhead[1])
+    np.savetxt("D:/DATA/Calcium Oscillation Data/Figures and source data/4880 CICADA response/#"+filename+"ttt_20x avg.csv",out, delimiter=',', comments='', fmt='%s')
 print('finished')
 
