@@ -27,12 +27,17 @@ DO_AUC=True
 AUC_norm=False ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
 
 #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
-parentFolder = "#492"
+parentFolder = "#465"
 
 #Frame per second for the experiment (used only in Plot.py)
-fps = 7.46
+fps = 6.53
 # sample spacing
 T = 1.0 / fps # 8Hz
+##Amount of averaging to do (relates to Rename20xavg script and tempalte matching)
+Avg_c = 6
+minPlane = 1 #1st plane which is present. Use literal nubmers, e.g. Plane0=0 and Plane 1=1
+maxPlane = 4  #last plane which is present
+
 
 #window for normalization
 #For a normal recording ~3-400 seconds is fine. For things that last a long time or have prolonged elevations in calcium (4880/GRP) 800 seconds or more seems to be necessary.
