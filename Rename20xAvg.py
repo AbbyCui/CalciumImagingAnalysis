@@ -6,19 +6,20 @@ import matplotlib.pyplot as plt
 import sys
 import os
 
+#These should all be pulled from the constant file. Only change this if it's not set in the constant file
+
 #enter parameters
-DataFolder = 'E:/#489 - Copy/#489/OutputData/'
-exp = str(489)
-planeRange = range(0,5) #range(1,5) iterates over plane 1,2,3,4
-Avg_Amount = 5
-
-
+Avg_Amount = Avg_c
+planeRange = range(minPlane,(maxPlane+1)) #range(1,5) iterates over plane 1,2,3,4
+print("Traces are being pulled from:", pathToOutputData)
+DataFolder = pathToOutputData ##or you can just enter the file location manually, e.g. E:/#465/#465/OutputData/' 
+exp=str(parentFolder) ##Or you can enter it manually, it just needs to be a string
 
 ####
 ROIsToRemove = np.zeros((1,1))
 for p in planeRange:
     #import and extract smoothed data
-    filename = '#' + exp + '_P'+str(p)
+    filename = exp + '_P'+str(p)
     splPATH = DataFolder + filename
     smoothed = np.loadtxt(splPATH +"_Smoothed.csv",delimiter=',',dtype=str)
 
