@@ -12,6 +12,8 @@ exp = str(489)
 planeRange = range(0,5) #range(1,5) iterates over plane 1,2,3,4
 Avg_Amount = 5
 
+
+
 ####
 ROIsToRemove = np.zeros((1,1))
 for p in planeRange:
@@ -19,6 +21,7 @@ for p in planeRange:
     filename = '#' + exp + '_P'+str(p)
     splPATH = DataFolder + filename
     smoothed = np.loadtxt(splPATH +"_Smoothed.csv",delimiter=',',dtype=str)
+
     f = Utility.extractData(debug, smoothed, ROIsToRemove = ROIsToRemove, stimStart = stimStart, stimEnd = stimEnd)
 
     #calculate 20x average
@@ -29,7 +32,7 @@ for p in planeRange:
         thisf = np.array(f[1+i*Avg_Amount:i*Avg_Amount+Avg_Amount,...],dtype = float)
         # print(thisf)
         avg[i+1,...] = np.mean(thisf,axis = 0) #axis =0 -> average downwards across 20 rows
-    out = avg.astype(str)
+    out = avg.astype(str, copy=True) 
 
     #change ROI name to format such as exp465_P0_ROI002
     head=f[0,...]
