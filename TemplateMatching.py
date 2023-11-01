@@ -7,16 +7,17 @@ import sys
 import os
 
 #enter parameters
-Avg_Amount = '5' ##this needs to be a string 
-ParentDirectory = 'E:/#489 - Copy/#489/'
-template_name = "#489_Non-Itch IN"
-expNum = str(489)
-planeRange = range(0,5) #range(1,5) iterates over plane 1,2,3,4
+template_name = "#465_All Cellls"
 
+#only change this if it's not assigned in the constant file
+Avg_Amount = str(Avg_c) ##this needs to be a string 
+planeRange = range(minPlane,(maxPlane+1)) #range(1,5) iterates over plane 1,2,3,4
 
 #assign directory based on our standard organization
-dir = ParentDirectory + 'OutputData/' ##where your averaged/smoothed traces are
-temp_dir = ParentDirectory + 'Data/' ##where your filter files are
+expNum = str(parentFolder) ##Or you can enter it manually, it just needs to be a string
+
+dir = pathToOutputData ##or you can just enter the file location manually, e.g. E:/#465/#465/OutputData/'  ##where your averaged/smoothed traces are
+temp_dir = "../"+parentFolder+"/Data/" ##where your filter files are
 output = template_name #specify output file name, or by default use the name of the template CSV
 #load files with headers for ROIs to be extracted (e.g. exp456_P1_ROI002)
 
@@ -31,7 +32,7 @@ numROI = len(template)
 
 # import raw data, normalized data, and smoothed data
 for p in planeRange:
-    filename = '#'+expNum+'_P'+str(p)
+    filename = expNum+'_P'+str(p)
     splPATH = dir + filename 
     avg = np.loadtxt(splPATH + "_" + str(Avg_Amount) + "x avg.csv",delimiter=',',comments='%',dtype=str)
     ROIsToRemove = np.zeros((1,1))
