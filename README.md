@@ -131,10 +131,11 @@ python StitchFiles.py "#462" "MaxResponse"
 ```
 
 ## Rename20xAvg.py and TemplateMatching.py
-Rename20xAvg.py performs 20x average on input csv and rename the ROI names from 'Mean34' to 'exp465_P0_034'. This script produces one output csv file for each plane.
-You should input experiment number and which planes you'd like to perform 20x avg at the beginning of the script. Also make sure to change all paths to input and output folder.
+Rename20xAvg.py performs 20x average (or whatever averaging you'd like) on input csv and rename the ROI names from 'Mean34' to 'exp465_P0_034'. This script produces one output csv file for each plane.
 
-![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/8cfb5b27-a56c-4f96-ac62-3c22a570d31d)
+By default the script will grab the relevant information from the constant file as it will assume you're operating within the folder where it resides so input the number of planes and amount of averaging into the constant file.
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/8d4b41f5-5e4c-416b-a90d-f0714c409a63)
+
 
 TemplateMatching.py takes in a csv file with only the header (first row containing ROI names for the desired ROIs) as template. This file can contain ROIs from different planes.
 
@@ -148,7 +149,11 @@ then will output a csv containing the smoothed/20x smoothed data points for each
 
 ![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/edccc02f-044d-44fd-b42a-764337e679cf)
 
-You'll have to specify some parameters, and also make sure to specify output file path at the end of the script
-![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/61777628-d197-4e2f-870b-abd3d64a2877)
+By default it will assume the location of the template that it uses for matching (i.e. the cells you want to pull out) is within the Data folder. It will then (by default) save those traces back to the output folder.
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/7d88f2eb-2fe9-47d1-b5ac-5f63e41bf9e8)
+
+You will need to specify the name of the file and it will name the output file the same name.
+![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/9a1e027c-1ca7-44b5-b47f-3b04118e6a1a)
+
 
 
