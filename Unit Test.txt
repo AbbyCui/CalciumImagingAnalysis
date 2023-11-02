@@ -35,7 +35,13 @@ Run these commands all at once (make sure to include a return at the end)
 
 # If you're looking at pulling traces, you can make a csv of the 'good' cells, run these scripts and pull out only the traces you want
 Python Rename20xAvg.py
-Python TemplateMatching.py
+Python TemplateMatching.py 
+
+##you can also pass the filter name in the terminal if you want to chain a bunch of different filters and then let it run. e.g.
+Python TemplateMatching.py "500_Control GRPR Positive Int"
+Python TemplateMatching.py "500_Control GRPR Neg Int"
+"finished"
+
 
 # quantify SpikePattern.py to identify the AUC, sd and median of spike time of all ROIs for 
 # one single given stimuli window
