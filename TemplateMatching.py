@@ -7,11 +7,16 @@ import sys
 import os
 
 #enter parameters
-template_name = "#465_All Cellls"
+try:
+    template_name = sys.argv[1]
+    print("using constants from terminal. Template Name is: ",template_name)
+except:
+    print("Starting TemplateMatching.py with variables in .py file")
+    template_name = "500_Control GRPR Int"
 
 #only change this if it's not assigned in the constant file
 Avg_Amount = str(Avg_c) ##this needs to be a string 
-planeRange = range(minPlane,(maxPlane+1)) #range(1,5) iterates over plane 1,2,3,4
+planeRange = range(0,1) #range(1,5) iterates over plane 1,2,3,4
 
 #assign directory based on our standard organization
 expNum = str(parentFolder) ##Or you can enter it manually, it just needs to be a string
