@@ -129,7 +129,7 @@ for plane in range(0,int(float(sys.argv[1]))):
 
     #### calculate median,mean and 95 percentile (2.5%-97.5%) for stripped dataset
     y,x=stripped.shape
-    summary_stripped = [postfix+"_mean_"+planeNumber,postfix+"_median_"+planeNumber,"lower 95CI","upper 95CI"]
+    summary_stripped = [postfix+"_mean_"+planeNumber,postfix+"_median_"+planeNumber,"lower 95 range","upper 95 range"]
     for i in range(1,y):
         data=stripped[i,1:] # remove the first column b/c it'll be the frame number
         data=data.astype(float)    
@@ -146,8 +146,8 @@ for plane in range(0,int(float(sys.argv[1]))):
         median = np.median(data)
         summary_stripped=np.vstack((summary_stripped,[mean,median,l,u]))
 
-    np.savetxt(splPATH + planeNumber+"_avg Peri-stim "+postfix+".csv",summary_stripped, delimiter=',', comments='', fmt='%s')
-    print("wrote to file",splPATH + planeNumber+"_avg Peri-stim "+postfix+".csv")
+    np.savetxt(splPATH +"_avg Peri-stim "+postfix+".csv",summary_stripped, delimiter=',', comments='', fmt='%s')
+    print("wrote to file",splPATH +"_avg Peri-stim "+postfix+".csv")
 
 ########### Finish running each individual planes##########
 
