@@ -98,8 +98,6 @@ def extractData (debug, data, ROIs = "all", ROIsToRemove = [], stimStart = 0, st
     if str(ROIs) == "all":
         for ROI in range(1,x):
             if ROI not in ROIsToRemove:
-                if debug:
-                    print("ROI=",ROI)
                 ROIdata = data[stimStart:stimEnd,ROI] #take the ROIth column in the data sheet
                 ROIsdata = np.vstack((ROIsdata,ROIdata)) #stack on top
                 ROIname = data[0,ROI]
@@ -125,7 +123,6 @@ def extractData (debug, data, ROIs = "all", ROIsToRemove = [], stimStart = 0, st
     if debug:
         print("first row of output:",output[0,0:9])
         print("first column of output:", output[0:9,0])
-        print("second column of output:",output[...,1])
         print("data shape of output:",output.shape)
 
     return output 

@@ -19,6 +19,8 @@ try:
     FileName = sys.argv[2]
     path = "../"+parentFolder+"/"+"OutputData/"
     foundFiles = [f for f in os.listdir(path) if f.endswith(FileName+'.csv')]
+    print("found files ",foundFiles)
+
 except:
     correct = 'n'
 
@@ -28,12 +30,14 @@ while correct == 'n' or correct =='N':
     FileName = input("Input file name here (e.g. 'SpikePattern'): ")
     path = "../"+parentFolder+"/"+"OutputData/"
     foundFiles = [f for f in os.listdir(path) if f.endswith(FileName+'.csv')]
-    print(foundFiles)
+    print("found files ",foundFiles)
     correct = input("Are these the file you want to merge? (y, n or q(quit)")
     if correct == "q" or correct == "Q" or correct == "quit":
         break 
 
 counter = 0
+#replace # to "exp", so that the stitched file can be parsed by python
+parentFolder = parentFolder.replace("#", "exp")
 
 if correct == 'y' or correct == "Y":
     for f in foundFiles:
@@ -53,4 +57,8 @@ if correct == 'y' or correct == "Y":
         else:
             output = np.hstack((output,file[...,1:]))
     output=np.transpose(output)
-    np.savetxt(pathToOutputData + parentFolder + FileName + "_Stitched.csv", output, delimiter=',', comments='', fmt='%s')
+
+    #change the parent folder name back from exp to #,so that the file name appear correct (#, instead of exp)
+    parentFolder = parentFolder.replace("exp", "#")
+    np.savetxt(pathToOutputData + parentFolder + "_"+FileName + "_Stitched.csv", output, delimiter=',', comments='', fmt='%s')
+    print("wrote to",pathToOutputData + parentFolder + "_"+FileName + "_Stitched.csv")

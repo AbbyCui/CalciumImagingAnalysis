@@ -159,6 +159,15 @@ for i in range(1,len(ROIs)+1):
             plt.axvspan(start, end, alpha=0.3, color=color) 
             plt.axhline (y = thisThreshold, xmin =percentStart, xmax =percentEnd, color='red', linewidth = 1 )
             plt.text(start, (yaxismax), stimName, rotation=-45, fontsize=12, wrap=False, ha='right')
+    
+    # add a red vertical line to mark the start of each recording
+    # this could be helpful in identifying z-drifts associated with the z-adjustments that we do between each recordings
+    # rec_length inidcates the length (in frames) of each recording
+    rec_length = (500,500,1000,1000,1500,1500,1500,920,1500,1500,2000,2000,1000,1000,3000,1000,1000,1000,1000,2000,475,2000,2000,2000,3000,3000,3000,3000,3500)
+    pos=0
+    for rec in range(len(rec_length)):
+        pos += rec_length[rec]
+        plt.vlines(pos/fps,0,3,colors="red",linewidth = 1)
 
     plt.savefig(pathToFigure + expNumber+"_" + planeNumber + "_ROI" + ROInumber + "-"+str(stimStart) + "-" + str(stimEnd) + ".png", dpi=300)
     plt.grid()

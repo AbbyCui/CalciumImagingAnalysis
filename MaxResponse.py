@@ -214,4 +214,4 @@ else:
     else:maxResponse = np.vstack((maxResponse,responders))
 
 #save maxResponse
-np.savetxt(pathToOutputData + splPrefix + "MaxResponse.csv", maxResponse, delimiter=',', comments='', fmt='%s')
+np.savetxt(pathToOutputData + splPrefix + "_MaxResponse.csv", maxResponse, delimiter=',', comments='', fmt='%s')
