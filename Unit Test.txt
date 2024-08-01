@@ -11,11 +11,12 @@ Run these commands all at once (make sure to include a return at the end)
 # raw screening of bad ROIs, also get a sense of how to analyze
     plot.py P0 5000 10000  (this plots frames 5000 to 10000)
    Input arguments are: Plot.py ["plane"] [start] [stop]
-
-    python Plot.py "P0" 1 "all"
-    python Plot.py "P1" 1 "all"
-    python Plot.py "P2" 1 "all"
-    python Plot.py "P3" 1 "all"
+    python ProcessData.py "P0"
+    python Plot.py "P0" 1 all
+    python Plot.py "P1" 1 all
+    python Plot.py "P2" 1 all
+    python Plot.py "P3" 1 all
+    python Plot.py "P4" 1 all
     "finished"
 
     secondsperinch (100-800 are good numbers). Default is 800, but you can change it in the constant file if desired
@@ -30,7 +31,8 @@ Run these commands all at once (make sure to include a return at the end)
     python MaxResponse.py "P1"
     python MaxResponse.py "P2"
     python MaxResponse.py "P3"
-    python StitchFiles.py "#462" "MaxResponse"
+    python MaxResponse.py "P4"
+    python StitchFiles.py "#35" "MaxResponse"
     "finished"
 
 # If you're looking at pulling traces, you can make a csv of the 'good' cells, run these scripts and pull out only the traces you want
@@ -56,4 +58,26 @@ Python TemplateMatching.py "500_Control GRPR Neg Int"
     python StitchFiles.py "#462" "SpikePattern"
     "finished"
 
+# use Peri-Stimulus to extract ROIs of interest at the time window of interest
+# extracts the data withint peri-stimulus window (output one file ending with "Peri-stim"), 
+# and calculate mean, median, 95% range for each frame (output another file ending with "avg Peri-stim")
+
+    python Peri-Stimulus.py "P0"
+    python Peri-Stimulus.py "P1"
+    python Peri-Stimulus.py "P2"
+    python Peri-Stimulus.py "P3"
+    python Peri-Stimulus.py "P4"
+    python StitchFiles.py "#40" "full Peri-stim test"
+
 # some free area for you to organize and copy-paste your pipeline
+    python ProcessData.py "P0"
+    python Plot.py "P0" 1 all
+
+    python ProcessData.py "P1"
+    python ProcessData.py "P2"
+    python ProcessData.py "P3"
+    python ProcessData.py "P4"
+    python Plot.py "P1" 1 all
+    python Plot.py "P2" 1 all
+    python Plot.py "P3" 1 all
+    python Plot.py "P4" 1 all
