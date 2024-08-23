@@ -195,3 +195,17 @@ For all planes combined, the script will output 2 files
 2. allPlanes_avg Peri-stim (e.g. #40_allPlanes_avg Peri-stim test)
 
    This file computes mean, median, upper and lower limit of the 95% range of each frame within the timewindow for all selected cells from all planes.
+
+
+**Optional Improvements**
+-----------------------------------------------------------------------------------
+instead of running each script serially in the terminal you can run the 05 line of scripts which just runs each one in parallel. These assume 5 planes, but just add or remove tuples as necessary. This imroves the speed of processing by ~5x
+
+![image](https://github.com/user-attachments/assets/a1781faa-00c1-4cb8-a452-ec54eeafefe1)
+
+The 05Plot.py has the relevant variables for specifying the range and SPI at the top of the file. 
+
+It should be possible to stack these to run the whole pipeline at once, e.g. pasting this into the terminal
+Python 05ProcessData.py
+Python 05Plot.py
+Python 05MaxResponse.py
