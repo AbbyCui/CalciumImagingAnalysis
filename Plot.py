@@ -171,9 +171,9 @@ for i in range(1,len(ROIs)+1):
         plt.xticks(xmarks)
         #minor tick spacing
         minortickspacing=.1 #this is in fractions of major
-        tickspacing=tickspacing*minortickspacing
-        tickspacing=int(tickspacing)
-        xmarks=[i for i in range(leftxaxis,rightxaxis,tickspacing)]
+        minortickspacingplot=tickspacing*minortickspacing
+        minortickspacingplot=int(minortickspacingplot)
+        xmarks=[i for i in range(leftxaxis,rightxaxis,minortickspacingplot)]
         plt.xticks(xmarks,minor=True)
     
     #mark each stimulus with shadings and draw threshold for them with red line
