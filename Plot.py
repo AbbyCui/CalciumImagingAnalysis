@@ -28,7 +28,7 @@ try:
     SecondsPerInch = sys.argv[4]
     print("using SecondsPerInch from Terminal",SecondsPerInch)
 except:
-    print("using SecondsPerInch from Constant File")
+    print("using SecondsPerInch from Constant File", SecondsPerInch)
 
 # if have a csv. file with ROIs to remove, it will be included in plotting
 try:
@@ -50,7 +50,7 @@ try:
 
 except:
     ROIsToInclude = "all"
-    print("found no ROIsToInclude -> including all ROIs")
+    print("found no list of ROIs to specifically include -> including all ROIs")
 
 # if Figure folder do not exist, create one
 if not os.path.exists(pathToFigure[:-1]):
@@ -66,6 +66,30 @@ AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",del
 y,x = AllThresholds.shape
 GoodThresholds = AllThresholds[0:,0] #create new threshold array in which to place the thresholds post ROI removal
 ROInames = ["Frame",] #initiate new empty array
+
+Rec_Splits=0
+if os.path.isfile(pathToData +"rec_length.csv"):
+    rec_length = np.loadtxt(pathToData +"rec_length.csv",delimiter=',',dtype=int)
+    print("found a recording length file, plotting rec splits")
+    Rec_Splits=1
+
+SecondsPerInch = int(SecondsPerInch)
+if(SecondsPerInch>200):
+    tickspacing=500
+else:
+    if(SecondsPerInch>100):
+        tickspacing=100
+    else:
+        if(SecondsPerInch)>50:
+            tickspacing=50
+        else:
+            if SecondsPerInch>25:
+                tickspacing=25
+            else:
+                tickspacing=10
+
+    #tickspacing=500 #this is in seconds;at 400 SPI, 500 is a good number. If you want to set it manually. Otherwise it'll be scaled ~ to SPI
+
 if debug:
     print("AllThresholds Shape",AllThresholds.shape)
     print("y,x",y,x)
@@ -88,7 +112,7 @@ AllThresholds = GoodThresholds.T #correct the axis of the data -> one colum for 
 
 TotalTime = smoothed.shape[0]-1
 TotalROIs = smoothed.shape[1]-1
-print("plotting experiment ",expNumber, "plane ",planeNumber,"with ",TotalROIs,"ROIs")
+print("plotting experiment ",expNumber, "plane ",planeNumber,"with a toatl number of ",TotalROIs,"ROIs")
 
 if str(ROIs) == "all":
     # arrange(x,y) -> [x,y), so end has to be TotalROIs+1 to include the last ROI
@@ -105,9 +129,9 @@ stimEnd = int(stimEnd)
 # extract only the wanted ROIs and crop recording to desired time frames
 if debug:
         print("stimStart=",stimStart,"stimEnd=",stimEnd)
+        print("plotting experiment ",expNumber, "plane ",planeNumber,"with",ROIsmoothed.shape[1]-1,"ROIs")
 ROIsmoothed = smoothed ##This used to be an ExtraData and was changed by CAW 2-17-23
 ROIs = ROIsmoothed[0,1:]
-print("plotting experiment ",expNumber, "plane ",planeNumber,"with ",ROIsmoothed.shape[1]-1,"ROIs")
 
 # range(x,y) -> [x,y), so end has to be len(ROI)+1 to include the last ROI
 for i in range(1,len(ROIs)+1):
@@ -123,7 +147,6 @@ for i in range(1,len(ROIs)+1):
     rightxaxis=(round(((stimEnd)/fps/10)*10))
     rightxaxis=int(rightxaxis)
     xaxisrange=(rightxaxis-leftxaxis)##this is the duration in seconds of the total recording
-    SecondsPerInch=int(SecondsPerInch)
     xaxisrange=int(xaxisrange)
     figsize=(xaxisrange/SecondsPerInch)
     figsize=int(figsize)
@@ -141,7 +164,7 @@ for i in range(1,len(ROIs)+1):
     plt.xlim(leftxaxis, rightxaxis)
     left, right = plt.xlim() 
     plt.subplots_adjust(left=None, bottom=None, right=None, top=.7, wspace=None, hspace=None)
-    tickspacing=10 #this is in seconds; 500 is a good number
+
     Ticks=1
     if(Ticks==1):
         xmarks=[i for i in range(leftxaxis,rightxaxis,tickspacing)]
@@ -182,11 +205,12 @@ for i in range(1,len(ROIs)+1):
     # this could be helpful in identifying z-drifts associated with the z-adjustments that we do between each recordings
     # rec_length inidcates the length (in frames) of each recording
     #rec_length = np.repeat(2500, 22)
-    rec_length = [700,0,1750,3000,1500,2000,3000,0,2000,2000,2000,2000,1300,2000,2000,2000,540,2000,1610,2000,1270,0,2000,3000,2000,3000,900,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,3000,3000]
-    pos=0
-    for rec in range(len(rec_length)):
-        pos += rec_length[rec]
-        plt.vlines(pos/fps,0,3,colors="red",linewidth = 1)
+    if Rec_Splits==1:
+        #rec_length = [700,0,1750,3000,1500,2000,3000,0,2000,2000,2000,2000,1300,2000,2000,2000,540,2000,1610,2000,1270,0,2000,3000,2000,3000,900,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,3000,3000] if you want to manually place your tick marks
+        pos=0
+        for rec in range(len(rec_length)):
+            pos += rec_length[rec]
+            plt.vlines(pos/fps,0,3,colors="red",linewidth = 1)
 
     plt.savefig(pathToFigure + expNumber+"_" + planeNumber + "_ROI" + ROInumber + "-"+str(stimStart) + "-" + str(stimEnd) + ".png", dpi=300)
     plt.grid()
