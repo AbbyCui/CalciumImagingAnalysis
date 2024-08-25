@@ -155,5 +155,57 @@ By default it will assume the location of the template that it uses for matching
 You will need to specify the name of the file and it will name the output file the same name.
 ![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/9a1e027c-1ca7-44b5-b47f-3b04118e6a1a)
 
+## Peri-Stimulus.py
+On a plane-by-plane basis: This script extract ROIs of interest at the time window of interest, extracts the data within the peri-stimulus window (output one file ending with "Peri-stim"), and calculate mean, median, 95% range for each frame (output another file ending with "avg Peri-stim"), 
+Then, the script stitches the "avg Peri-stim.cvs" from all planes together, and calculate mean, median, 95% range for cells from all planes.
+
+**Input files** : 
+1. Smoothed.csv (in OutputData folder)
+2. Stimulus.csv (in Data folder)
+3. #expNumber_ROIsToInclude.csv (e.g. #40_ROIsToInclude.csv, in Data folder), which follows the same format as ROIsToRemove.csv. This file allows you to pull only the desired cells from each plane
+![image](https://github.com/user-attachments/assets/cf1f7021-7704-4123-9710-09ef196cbf22)
+
+**Input info**
+
+Terminal Input: Enter the experiment Number (e.g. #40) in constant.py, and in terminal, the only required input is the number of total planes you have (P0-P4 = 5 planes in total). This will pull data from P0-P4.
+(e.g. python Peri-Stimulus.py 5)
+
+stim_index = [46] #index 1 means the 2nd stimulus (yes we love python); input list to merge multiple stim (e.g. [1,2,3])
+
+interval = 20*fps #20*fps would mean 20sec pre and post the start of the stim
+
+grace = 1.5*fps #exclude some time before and after stim start/end (this is useful when you're not so cofident about start/stop time stamps)
+
+postfix = "test" #something meaningful to include in file names
+
+**Output**
+For each plane, the script will output 2 files
+1. full Peri-stim *postfix of your choosing* (e.g.#40_P0_full Peri-stim test)
+
+   this file simply crops out the time window before and after stimulus
+   ![image](https://github.com/user-attachments/assets/e82e04de-2925-4348-bc80-7dc29b0d090d)
+
+3. avg Peri-stim *postfix of your choosing* (e.g.#40_P0_avg Peri-stim test)
+
+   this file calculates the mean, median, upper and lower limit of the 95% range of each frame within the timewindow.
+![image](https://github.com/user-attachments/assets/c1bda973-f880-4c93-96bd-f3915c09aa7c)
+
+For all planes combined, the script will output 2 files
+1. stitching "full Peri-stim" file from all planes together -> e.g #40_full Peri-stim test_Stitched
+2. allPlanes_avg Peri-stim (e.g. #40_allPlanes_avg Peri-stim test)
+
+   This file computes mean, median, upper and lower limit of the 95% range of each frame within the timewindow for all selected cells from all planes.
 
 
+**Optional Improvements**
+-----------------------------------------------------------------------------------
+instead of running each script serially in the terminal you can run the 05 line of scripts which just runs each one in parallel. These assume 5 planes, but just add or remove tuples as necessary. This imroves the speed of processing by ~5x
+
+![image](https://github.com/user-attachments/assets/a1781faa-00c1-4cb8-a452-ec54eeafefe1)
+
+The 05Plot.py has the relevant variables for specifying the range and SPI at the top of the file. 
+
+It should be possible to stack these to run the whole pipeline at once, e.g. pasting this into the terminal
+Python 05ProcessData.py
+Python 05Plot.py
+Python 05MaxResponse.py
