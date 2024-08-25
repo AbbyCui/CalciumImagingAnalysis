@@ -549,7 +549,7 @@ def extractEvent(debug,data,stim,AllThresholds):
     
     for x in range(1,xs): #for each ROI
         lastend=0
-        event = 1 #initialize event number as 0
+        event = 0 #initialize event number as 0
         s = 0 # initialize stimlus index as 1 *this was abby's code. I think it needs to be 0 because the stim array has no title so this is skipping the 1st stim row
         for y in range(1,ys): #for each frame in this ROI
             lastend=np.max(Ends[:,x])
