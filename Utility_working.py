@@ -549,7 +549,7 @@ def extractEvent(debug,data,stim,AllThresholds):
     
     for x in range(1,xs): #for each ROI
         lastend=0
-        event = 0 #initialize event number as 0
+        event = 1 #initialize event number as 0
         s = 0 # initialize stimlus index as 1 *this was abby's code. I think it needs to be 0 because the stim array has no title so this is skipping the 1st stim row
         for y in range(1,ys): #for each frame in this ROI
             lastend=np.max(Ends[:,x])
@@ -557,20 +557,21 @@ def extractEvent(debug,data,stim,AllThresholds):
                 if debug:
                     print("Skipping this frame: value of y",y," Value of Ends",lastend)
             else: 
-                thisData = float(data[y,x]) #extract raw data and change to float
-                #determine threshold based on which stimuli this current frame is in
+                thisData = float(data[y,x]) #extract raw data and change to float, this is the entire Trace for a single ROI
+                #determine threshold based on which stimuli this current frame is in. This Looks at the frame (e.g. the 3500th frame) and checks if it falls between the start and stop of each specified stim
                 for i in range(s,stimNum):
-                    if y >= float(stim[i,1]) and y <= float(stim[i,2]):
-                        s = i
+                    if y >= float(stim[i,1]) and y <= float(stim[i,2]): ##does this frame fall within the range of a start stop
+                        s = i ##if yes, then assign s to the current number so it can look up the appropriate threshold, otherwise it'll use the previous threshold
                         break
                 st=s+1 #this needs to be +1 relative to the stim array as it contains the title row
                 thisThreshold = float(AllThresholds[st,x])
+                if debug:
+                    print("ith stim is",s,"time",y,"x",x,"thisthresh",thisThreshold)
                 # find events
                 if thisData>thisThreshold:
                     spikesInOnes[y,x] = 1
-                    # if the prior frame is 0 (smaller than threshold)
                     try:
-                        if int(spikesInOnes[y-1,x]) == 0:
+                        if int(spikesInOnes[y-1,x]) == 0: # if the prior frame is 0 (smaller than threshold)
                             start = y
                             maxvalue=thisData
                             if debug:
@@ -592,7 +593,7 @@ def extractEvent(debug,data,stim,AllThresholds):
                             #if spike lasted for more than 4 [ or the variable spikeduration] (variable name) frames, count as an event
                             if end-start >= constant.spikeduration:
                             #after a spike ends, add start and finish to startsAndEnds as a tuple
-                                varThreshold=max(thisThreshold*.6,.15)
+                                varThreshold=max(thisThreshold*.8,.15)
                                 if float(doublesmoothed[y+1,x]) < varThreshold:
                                     event += 1
                                     Starts[event,x] = start
@@ -627,6 +628,176 @@ def extractEvent(debug,data,stim,AllThresholds):
     if debug:
         print("Starts has shape:",Starts.shape)
         print("Ends has shape:",Ends.shape)
+    #np.savetxt(constant.pathToOutputData + "spikesInOnesAfterFiling.csv", spikesInOnes, delimiter=',', comments='', fmt='%s')
+    #np.savetxt(constant.pathToOutputData + "starts.csv", Starts, delimiter=',', comments='', fmt='%s')
+    #np.savetxt(constant.pathToOutputData + "ends.csv", Ends, delimiter=',', comments='', fmt='%s')
+    return Starts, Ends
+
+def extractEventGreedy(debug,data,stim,AllThresholds):
+    """
+    extract the start and end of each event, as well as a dataframe with 1s representing frames above threshold and 0s representing frames below threshold
+    Input np.array of all ROIs with headers, threshold
+    Outputs Starts and Ends as np.array with the same dimensions as data, but with zeros as headers, and frame number of start and end of each event for each ROI
+    also output spikesInOnes with the same dimensions and headers as data, but each value are mutated to 1 if the value is above threshold, or 0 if below
+
+    Of note, this function is distinct from the original which is purely threshold based, this one will find the start based on a threshold, but
+    then assign a stop when the derivative is negative
+    """
+    if debug:
+        print("----------eventCounter function----------")
+    print("-------Starting Greedy Event Extraction-----------")
+    num_rows, num_cols = data.shape
+
+    if debug:
+        print("----------smooth function----------")
+        print("data input to smooth function has shape:", data.shape)
+        print("data type:", data.dtype)
+        print("data frames:", data[...,0])
+        print("data ROIs:", data[0,1:])
+
+    ##Smooth the data a little bit more for use with the derivative (~4 frames)
+    DerivativeInput=np.zeros_like(data,dtype = float)
+    Derivative=np.zeros_like(data,dtype = float)
+    
+    i=1
+    while i< num_cols: #loop for each ROI (except for the first column of frames)
+        DerivativeInput[1:,i] = signal.savgol_filter(data[1:,i],13, 2) #This parameter will definitely need to be altered to other frame rates. 0th order with few neighboors is simliar to a 2nd order with 8ish, didn't seem to matter much. 
+        i+=1
+
+    if constant.debugCSV:
+            np.savetxt(constant.pathToOutputData + "DerivativeInput.csv", DerivativeInput, delimiter=',', comments='', fmt='%s')
+
+    ## generate the derivate of the trace using the smoothed data
+    i=1
+    time_values = np.arange(0, len(DerivativeInput[0:,i]) / constant.fps, 1 / constant.fps) ##generate the time axis 
+    dt = np.diff(time_values) #time gap for each 
+    while i< num_cols: #loop for each ROI (except for the first column of frames)
+            Derivative[1:,i] = np.diff(DerivativeInput[0:,i]) / dt
+            i+=1
+
+    if constant.debugCSV:
+        np.savetxt(constant.pathToOutputData + "Derivative.csv", Derivative, delimiter=',', comments='', fmt='%s')
+    
+    spikesInOnes = np.zeros_like(data)
+    spikesInOnes[...,0] = data[...,0] ##adding  the first column - frame number  ##8/8/24 CAW commented out, I think the Data alraedy has a header? Check if this broke things.
+    spikesInOnes[0,...] = data[0,...] #adding back the first row - ROIs 
+    
+    ys,xs = data.shape
+    stimNum = stim.shape[0]-1
+    # startsAndEnds have the same dimensions and headers as data, but filled with tuples of (start,end) frame numbers for each event
+    Starts = np.zeros_like(data,dtype = float)
+    Ends = np.zeros_like(data,dtype = float)
+    if debug:
+        print("ys =",ys)
+        print("xs =",xs)
+        print("initialized spikesInOnes with the second row:",spikesInOnes[1,...])
+    
+    for x in range(1,xs): #for each ROI
+        event = 1 #initialize event number as 0
+        s = 0 # initialize stimlus index as 1 *this was abby's code. I think it needs to be 0 because the stim array has no title so this is skipping the 1st stim row
+        if x % 10 == 0:
+            print("Starting ROI",x)
+        realstart = 0
+        start = 0
+        end = 0
+        EventDuration = 0
+        NegativeSlope = 0
+        PositiveSlope = 0
+        ConsecutiveNegativeFrames = 0
+        for y in range(1,ys): #for each frame in this ROI
+            thisData = float(data[y,x]) #extract raw data and change to float, this is the entire Trace for a single ROI
+            thisDerivative=float(Derivative[y,x]) ##extract the corresponding derivative of the same trace
+            #determine threshold based on which stimuli this current frame is in. This Looks at the frame (e.g. the 3500th frame) and checks if it falls between the start and stop of each specified stim
+            for i in range(s,stimNum):
+                if y >= float(stim[i,1]) and y <= float(stim[i,2]): ##does this frame fall within the range of a start stop
+                    s = i ##if yes, then assign s to the current number so it can look up the appropriate threshold, otherwise it'll use the previous threshold
+                    break
+            st=s+1 #this needs to be +1 relative to the stim array as it contains the title row
+            thisThreshold = float(AllThresholds[st,x])
+            if debug:
+                print("ith stim is",s,"time",y,"x",x,"thisthresh",thisThreshold)
+                if x==17: ##Replace this with whatever ROI you want to check
+                    print("ith stim is",s,"time",y,"ROI/x",x,"thisthresh",thisThreshold)
+            # find events
+            if thisData>thisThreshold:
+                try:
+                    spikesInOnes[y,x] = 1
+                    if y>1:
+                        if int(spikesInOnes[y-1,x]) == 0: # if the prior frame is 0 (smaller than threshold)
+                            start = y
+                            EventDuration = 1
+                            NegativeSlope = 0
+                            PositiveSlope = 1
+                            ConsecutiveNegativeFrames = 0
+                            realstart = 0
+                            if debug:
+                                print("Start is assigned at Current frame",y,"prior frame is a 0",thisData,"at ROI/column",x)
+                        else:
+                            if thisDerivative > 0:
+                                PositiveSlope = PositiveSlope + 1
+                            else:
+                                NegativeSlope = NegativeSlope + 1
+                            EventDuration = EventDuration + 1 ## for each frame that stays above threhsold, this goes up
+
+                        if EventDuration > constant.spikeduration:  ##if the past 3 frames are 1s then start checking for the derivative as well as this is a valid event
+                            if start > 0:
+                                realstart=start
+                            if debug:
+                                print("there was an event with more than 4 frames at this ROI and Frame",x,y)
+                            if PositiveSlope < 4: #if the 4 frame are not all increasing, then it's a false start. Should match spike duration? Might not need to if 3/4 is ok
+                                if float(Derivative[y-3,x]) > 0:
+                                    PositiveSlope = PositiveSlope - 1
+                                else:
+                                    NegativeSlope = NegativeSlope - 1
+                                EventDuration = EventDuration - 1
+                            else:
+                                if PositiveSlope==4:
+                                    realstart=y-3
+                                if thisDerivative < 0:
+                                    if float(Derivative[y-1,x]) < 0:
+                                        ConsecutiveNegativeFrames = ConsecutiveNegativeFrames + 1
+                                    else:
+                                        ConsecutiveNegativeFrames = 0
+                                    if ConsecutiveNegativeFrames > 2: #Number of consecutive frames which need to have a negative slope to be considered the end of an event
+                                        end = y ##now that there have been 3 consecutively negative frames, this is the end of the event
+                                        #after a spike ends, add start and finish to startsAndEnds as a tuple
+                                        if debug:
+                                            print("there was a start stop assigned ROI and Frame",x,y)
+                                        Starts[event,x] = realstart
+                                        Ends[event,x] = end
+                                        event += 1 ##this was before assignign the events originally, if things break, maybe it was this? I don't know why assining starts and stops began at the 2nd rather than the 1st row.
+                                        start = 0
+                                        realstart = 0
+                                        end = 0
+                                        EventDuration = 0
+                                        NegativeSlope = 0
+                                        PositiveSlope = 0
+                                        ConsecutiveNegativeFrames = 0
+                except:
+                    print("an exception occured at frame",y,"value of frame is",thisData,"at ROI/column",x)
+            else: ##if it's not above threshold, reset all paramters back to zero and try again with the next frame
+                spikesInOnes[y,x] = 0
+                if EventDuration > constant.spikeduration:
+                    if debug:
+                        print("There was an event which lasted longer than 4 frames but didn't have 3 consecutive negatively sloped frames. FYI. ROI and Frame",x,y)
+                    end = y ##       
+                    Starts[event,x] = realstart
+                    Ends[event,x] = end
+                    event += 1 ##this was before assignign the events originally, if things break, maybe it was this? I don't know why assining starts and stops began at the 2nd rather than the 1st row.
+                realstart = 0
+                start = 0
+                end = 0
+                EventDuration = 0
+                NegativeSlope = 0
+                PositiveSlope = 0
+                ConsecutiveNegativeFrames = 0
+    if debug:
+        print("Starts has shape:",Starts.shape)
+        print("Ends has shape:",Ends.shape)
+    if constant.debugCSV:
+        np.savetxt(constant.pathToOutputData + "spikesInOnesAfterFiling.csv", spikesInOnes, delimiter=',', comments='', fmt='%s')
+        np.savetxt(constant.pathToOutputData + "starts.csv", Starts, delimiter=',', comments='', fmt='%s')
+        np.savetxt(constant.pathToOutputData + "ends.csv", Ends, delimiter=',', comments='', fmt='%s')
     return Starts, Ends
    
 def eventCounter (debug, Starts):
