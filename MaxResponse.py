@@ -75,7 +75,7 @@ stimNum = stimulus.shape[0]
 
 #extract only the desired ROIs (extract all frames)
 ROIdata = Utility.extractData(debug, data, ROIs, ROIsToRemove, stimStart = 1, stimEnd = "all") 
-Starts,Ends = Utility.extractEvent(debug, ROIdata, stimulus, AllThresholds)
+Starts,Ends = Utility.extractEvent(debug, ROIdata, stimulus, AllThresholds) ##Options include either extractEventGreedy or extractEvent is more conservative in delineating events. 
 EventAmp = Utility.getEventAmp(debug,ROIdata,Starts,Ends)
 ROInum = ROIdata.shape[1]-1
 if debugCSV:
