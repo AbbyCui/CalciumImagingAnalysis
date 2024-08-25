@@ -24,6 +24,12 @@ try:
 except:
     print("Starting Plot.py with variables in constant.py")
 
+try:
+    SecondsPerInch = sys.argv[4]
+    print("using SecondsPerInch from Terminal",SecondsPerInch)
+except:
+    print("using SecondsPerInch from Constant File")
+
 # if have a csv. file with ROIs to remove, it will be included in plotting
 try:
     AllROIsToRemove = np.loadtxt(pathToData +"BadROIs.csv",delimiter=',',dtype=str)
