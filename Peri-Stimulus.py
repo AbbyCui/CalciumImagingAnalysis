@@ -13,24 +13,25 @@ import subprocess
 if debug:
     print("--------------Peri-Stimulus.py---------------")
 
+x=sys.argv[2].split()
+print(x)
+stim_index=[int(i) for i in x]
+postfix = sys.argv[3]
+
+
 ## User input
-stim_index = [46] #index 1 means the 2nd stimulus (yes we love python); input list to merge multiple stim (e.g. [1,2,3])
 interval = 20*fps #10*fps would mean 10sec pre and post the start of the stim
 grace = 1.5*fps #exclude some time before and after stim start/end (this is useful when you're not so cofident about start/stop time stamps)
-postfix = "test" #something meaningful to include in file names
 
 ## Note to self
 # 
-# # [6,7,8,9,10,11,12] for pre 4880
-# [6,7,10,12] 100g
-# [8,11] 100g x2
-# [9] 60g
+# [16,17,18,19] for pre 4880 scratch
+# [20,21,22] for pre 4880 cold
 
-# [36,37,38,44,45,46] for post 4880
-# [38,44,45] 100g
-# [36] 60g
-# [37] 60g x2
-# [46] 100gx2
+# [32,33] for post 4880 scratch
+# [34,35,36] for post 4880 cold
+
+
 
 for plane in range(0,int(float(sys.argv[1]))):
     # if want to customize some varibles, can enter them in terminal (see Unit Test.txt for example)
@@ -61,10 +62,6 @@ for plane in range(0,int(float(sys.argv[1]))):
         ROIsToInclude = "all"
         print("including all ROIs")
 
-    # if Figure folder does not exist, create one
-    if not os.path.exists(pathToFigure[:-1]):
-        os.makedirs(pathToFigure[:-1])
-
     #import data
     splPATH = pathToOutputData + splPrefix
     smoothed = np.loadtxt(splPATH +"Smoothed.csv",delimiter=',',dtype=str)
@@ -73,22 +70,26 @@ for plane in range(0,int(float(sys.argv[1]))):
     starts = stimulus[...,1]
     ends = stimulus [...,2]
     stimName = stimulus[...,0]
+    #pull out all durations for all stim
     durations = [float(xi) - float(yi) for xi, yi in zip(ends, starts)]
-    max_dur = max(durations)
+    theseDurations = [durations[i] for i in stim_index] #contains a list of durations of only the selected stims
+    max_dur = max(theseDurations) # max duration amongst the chosen stimuli
 
     # Extract data
     for i in range(len(stim_index)): #for each stimulus start time
-
+        
         # extract the start and end for this specific stimulus
         this_start = math.ceil(float(starts[stim_index[i]]))-grace
         this_end = math.ceil(float(ends[stim_index[i]]))+grace
-        duration=this_end-this_start
+        duration=max_dur
         this_name= stimName[stim_index[i]]
+
 
         # cropp out the time before and after stimulus (tihs includes header)
         croppedData = Utility.extractData(debug,smoothed,stimStart=this_start-interval,stimEnd=this_start + interval + duration)
         y,x=croppedData.shape
-        
+        if debug:
+            print("cropping out data from frame",this_start-interval,"to frame",this_start + interval + duration,"shape of cropped data:", croppedData.shape)
         # assemble header
         # stim start,end,name
         name = [str(ele) for ele in [this_name] for i in range(x-1)] #repeat this_start for each ROI
@@ -113,15 +114,16 @@ for plane in range(0,int(float(sys.argv[1]))):
 
         if debug:
             print("averaged frame 1-",interval-grace, "as pre, and ",interval+duration+grace, "-",duration + 2*interval,"as post")
-            print("for stimulus:",stimName[stim_index[i]])
+            print("for stimulus:",stimName[stim_index[i]],"at index",i)
 
         #put them all together
         if i==0:
+            # contains header (first column)
             out = np.vstack((croppedData[0,:],name,start_head,end_head,pre,post,croppedData[1:,:]))
             stripped = croppedData
         else:
-            temp=np.vstack((croppedData[1,:],name,start_head,end_head,pre,post,croppedData[:,1:]))
-            out=np.hstack((out,temp[...,1:]))
+            temp=np.vstack((croppedData[0,:],name,start_head,end_head,pre,post,croppedData[1:,:]))
+            out=np.hstack((out,temp[...,1:])) # remove header from temp
             stripped = np.hstack((stripped,croppedData[...,1:]))
         
 
@@ -134,7 +136,7 @@ for plane in range(0,int(float(sys.argv[1]))):
         data=stripped[i,1:] # remove the first column b/c it'll be the frame number
         data=data.astype(float)    
         
-        if debug and i%1000 == 1:
+        if i%1000 == 1:
             # print out every 10000 frames
             print("reaching i=",i,"out of",y) 
             print("max signal in this frame:", np.max(data))
@@ -146,13 +148,13 @@ for plane in range(0,int(float(sys.argv[1]))):
         median = np.median(data)
         summary_stripped=np.vstack((summary_stripped,[mean,median,l,u]))
 
-    np.savetxt(splPATH +"_avg Peri-stim "+postfix+".csv",summary_stripped, delimiter=',', comments='', fmt='%s')
+    np.savetxt(splPATH +"avg Peri-stim "+postfix+".csv",summary_stripped, delimiter=',', comments='', fmt='%s')
     print("wrote to file",splPATH +"_avg Peri-stim "+postfix+".csv")
 
 ########### Finish running each individual planes##########
 
 # Run Stitch Files to combine data from all planes
-subprocess.run(["python", "StitchFiles.py", "#40", "full Peri-stim "+postfix])
+subprocess.run(["python", "StitchFiles.py", parentFolder, "full Peri-stim "+postfix])
 
 # Load the stitched file and calculate mean, median, 95% range
 stitched = np.loadtxt(pathToOutputData + parentFolder + "_"+"full Peri-stim "+postfix + "_Stitched.csv",delimiter=',',dtype=str,ndmin=2)
@@ -168,8 +170,8 @@ for i in range(6,x):
     # not sure why i had to remove the second column as well, but hey, it works
     data=stitched[2:,i] 
     data=data.astype(float)    
-    if debug and i%1000 == 1:
-        # print out every 10000 frames
+    if i%500 == 1: # print out results every 100 frames
+        # print out every 500 frames
         print("reaching i=",i,"out of",y) 
         print("max signal in this frame:", np.max(data))
 

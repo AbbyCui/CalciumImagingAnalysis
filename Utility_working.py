@@ -448,6 +448,8 @@ def getAllThresholds(debug,data,stim,fps,threshold):
         stimStart = int(float(stim[i,1]))
         baselineEnd = stimStart-1
         baselineStart = int(stimStart-1-10*fps)
+        if baselineStart<1:
+            baselineStart=1
         StimThresholds = getStimThresholds(debug,data,baselineStart,baselineEnd,threshold)
         AllThresholds[i+1,1:] = StimThresholds
         if debug:
@@ -563,8 +565,6 @@ def extractEvent(debug,data,stim,AllThresholds):
                         break
                 st=s+1 #this needs to be +1 relative to the stim array as it contains the title row
                 thisThreshold = float(AllThresholds[st,x])
-                if debug:
-                    print("ith stim is",s,"time",y,"x",x,"thisthresh",thisThreshold)
                 # find events
                 if thisData>thisThreshold:
                     spikesInOnes[y,x] = 1
@@ -804,7 +804,7 @@ def getMaxResponseAll (debug,data,stimStart,stimEnd,Starts,Ends):
     Output: maxResposne dataframe with 1 row, and the same number of columns the number of ROIs (no header)
     '''
     if debug:
-        print("----------getMaxResponse function----------")
+        print("----------getMaxResponseAll function----------")
     #get dimension of data
     y,x = data.shape
     #initialize maxResponse with 2 rows, and the same number of columns as data
@@ -814,17 +814,17 @@ def getMaxResponseAll (debug,data,stimStart,stimEnd,Starts,Ends):
     while c<(x):
         yrange=y-1
         temp = data[1:y,c]
-        if(debug==1):
-            print(temp[0])
+        if debug and c%10==1:
+            print("c=",c,", temp[0:5]=",temp[0:5])
             print(temp.shape)
-            print(type(temp))
+            print("stimStart=",stimStart,"stimEnd=",stimEnd)
         stimwindow=temp[stimStart:stimEnd]
-        stimwindow=stimwindow.astype(float)  
+        stimwindow=stimwindow.astype(float)
+        print("stimwindow =",stimwindow)  
         tempmax=np.max(stimwindow)
-        if(debug==1):
+        if debug and c%10==1:
             print(tempmax)
             print(tempmax.shape)
-            print(type(tempmax))
         MaxResponseAll[0,(c-1)]=tempmax
         c+=1
     return MaxResponseAll

@@ -1,6 +1,7 @@
 '''
 Plots user specified exp number, plane, ROI, time frame (in sec), with each stimuli shaded with user specified colors (at the 3rd column of the Stimulus.csv)
 Make sure stimulus names don't include ","
+Can exclude ROIs with ROIstoRemove.csv; or include only selected ROIs using ROIstoInclude.csv
 '''
 import Utility_working as Utility #custom-made utility file, contains lengthy functions
 from constant import *
@@ -32,7 +33,18 @@ try:
     
 except:
     ROIsToRemove = np.zeros((1,1))
-    print("plotting all ROIs")
+    print("found no ROIs to remove")
+
+# if have a csv file with ROIs to include, the script will only plot those ROIs
+try:
+    AllROIsToInclude = np.loadtxt(pathToData +"ROIsToInclude.csv",delimiter=',',dtype=str)
+    print("found ROIsToInclude. Only plotting ROIsToInclude")
+    ROIsToInclude=Utility.getROIsToRemove(debug, AllROIsToInclude, plane = planeNumber)
+    print("for plane",planeNumber,", ROIsToInclude=",ROIsToInclude)
+
+except:
+    ROIsToInclude = "all"
+    print("found no ROIsToInclude -> including all ROIs")
 
 # if Figure folder do not exist, create one
 if not os.path.exists(pathToFigure[:-1]):
@@ -41,7 +53,7 @@ if not os.path.exists(pathToFigure[:-1]):
 # import raw data, normalized data, and smoothed data
 splPATH = pathToOutputData + splPrefix
 smoothed = np.loadtxt(splPATH +"Smoothed.csv",delimiter=',',dtype=str)
-smoothed = Utility.extractData(debug, smoothed, ROIsToRemove = ROIsToRemove, stimStart = stimStart, stimEnd = stimEnd)
+smoothed = Utility.extractData(debug, smoothed, ROIsToRemove = ROIsToRemove, stimStart = stimStart, stimEnd = stimEnd, ROIs=ROIsToInclude)
 stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols = (0,1,2,3))
 
 AllThresholds = np.loadtxt(pathToOutputData + splPrefix +"AllThresholds.csv",delimiter=',',dtype=str)
@@ -53,7 +65,7 @@ if debug:
     print("y,x",y,x)
 
 for ROI in range(1,x): #skip the 0th row because it's the names 
-    if ROI not in ROIsToRemove:
+    if (ROI not in ROIsToRemove and ROIsToInclude == "all") or (ROIsToInclude != "all" and ROI in ROIsToInclude and ROI not in ROIsToRemove):
         if debug:
             print("ROI",ROI)
             print("Allthresholds",AllThresholds[0:,ROI])
@@ -62,7 +74,7 @@ for ROI in range(1,x): #skip the 0th row because it's the names
             print(thisgoodthreshold.shape)
         GoodThresholds = np.vstack((GoodThresholds,thisgoodthreshold)) #stack on top
         if debug:
-            print("ROIname",ROIname)
+            print("ROIname",ROInames)
     else:
         if debug:
             print("ROI in ROIsToRemove",ROI)
@@ -123,7 +135,7 @@ for i in range(1,len(ROIs)+1):
     plt.xlim(leftxaxis, rightxaxis)
     left, right = plt.xlim() 
     plt.subplots_adjust(left=None, bottom=None, right=None, top=.7, wspace=None, hspace=None)
-    tickspacing=500 #this is in seconds
+    tickspacing=10 #this is in seconds; 500 is a good number
     Ticks=1
     if(Ticks==1):
         xmarks=[i for i in range(leftxaxis,rightxaxis,tickspacing)]
@@ -163,7 +175,8 @@ for i in range(1,len(ROIs)+1):
     # add a red vertical line to mark the start of each recording
     # this could be helpful in identifying z-drifts associated with the z-adjustments that we do between each recordings
     # rec_length inidcates the length (in frames) of each recording
-    rec_length = (500,500,1000,1000,1500,1500,1500,920,1500,1500,2000,2000,1000,1000,3000,1000,1000,1000,1000,2000,475,2000,2000,2000,3000,3000,3000,3000,3500)
+    #rec_length = np.repeat(2500, 22)
+    rec_length = [700,0,1750,3000,1500,2000,3000,0,2000,2000,2000,2000,1300,2000,2000,2000,540,2000,1610,2000,1270,0,2000,3000,2000,3000,900,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,2000,3000,3000]
     pos=0
     for rec in range(len(rec_length)):
         pos += rec_length[rec]
