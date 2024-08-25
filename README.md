@@ -102,6 +102,9 @@ If you choose to do that, the Data folder will now look like
 
 ![image](https://user-images.githubusercontent.com/109237711/196476310-63edfbbb-bca1-4104-9bfa-dcfe894223f0.png)
 
+For visualization purposes, you can also only choose to plot selected ROI. This will require that you input a file named #expNumber_ROIsToInclude.csv (e.g. #40_ROIsToInclude.csv, in Data folder), which follows the same format as ROIsToRemove.csv. This file allows you to pull only the desired cells from each plane
+![image](https://github.com/user-attachments/assets/cf1f7021-7704-4123-9710-09ef196cbf22)
+
 
 ## MaxResponse.py
 Summarizes the max amplitude of each cell's response to each stimuli. If the cell doesn't reach threshold for the entire duration of the stimulus, amplitude will be 0.
