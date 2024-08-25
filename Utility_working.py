@@ -147,11 +147,6 @@ def normalizesplits(debug, data, window, percentile, TotalROIs):
     fbtemp=np.ones_like(rawdata[...,0])
     f = 0
 
-    if constant.percentile=="mode":
-            print("Mode normaliation enabled")
-    else:
-        print("Rolling normalization enabled. Percentile is:", constant.percentile)
-
     while f<(TotalROIs):
         #print out ROI number for every 10 ROIs
         if debug and f%10 == 0:
