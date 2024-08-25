@@ -28,6 +28,10 @@ stimulus = np.loadtxt(pathToData +"Stimulus.csv",delimiter=',',dtype=str,usecols
 
 #normalize and smooth data
 if(ThresholdsOnly==0):
+    if percentile=="mode":
+            print("Mode normaliation enabled")
+    else:
+        print("Rolling normalization enabled. Percentile is:", percentile)
     if(splitnorm==1):
         splits = np.loadtxt(pathToData +"Splits.csv",delimiter=',',dtype=int,usecols = (0))
         numsplits=(len(splits)-1)
