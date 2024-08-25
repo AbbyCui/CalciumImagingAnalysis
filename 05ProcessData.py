@@ -15,10 +15,11 @@ def main():
         ('ProcessData.py', ['P1']),
         ('ProcessData.py', ['P2']),
         ('ProcessData.py', ['P3']),
-        ('MaxResponse.py', ['P4'])
+        ('ProcessData.py', ['P4'])
     ]
     
     # Create a pool of processes, each running one of the scripts
+    print("Running the following:",scripts_with_args)
     with multiprocessing.Pool(processes=len(scripts_with_args)) as pool:
         pool.map(run_script, scripts_with_args)
 
