@@ -1,5 +1,6 @@
-Main
-===
+
+**Main**
+-----------------------------------------------------------------------------------
 
 # Calcium Imaging Analysis
 These series of scripts takes raw data resulted from FIJI-multi-measure to basic figures, analysis of ISI, max response during each stimuli and responders to each stimuli
