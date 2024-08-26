@@ -12,6 +12,7 @@ Contents
 
 .. toctree::
 
+   Setup
    Inputs
    Data Processing
    Plotting
