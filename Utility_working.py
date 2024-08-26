@@ -845,7 +845,6 @@ def getEventAmp(debug,data,Starts,Ends):
     #initialize eventAmp
     eventAmp = np.zeros_like(data,dtype = float)
     # for each ROI
-    print("x=",x)
     for i in range(1,x-1):
         #if the last frame is above threshold, there will be more values in "starts" than "ends" for this ROI
         numStart = np.count_nonzero(Starts[...,i])
@@ -986,7 +985,8 @@ def getMaxResponseAll (debug,data,stimStart,stimEnd,Starts,Ends):
             print("stimStart=",stimStart,"stimEnd=",stimEnd)
         stimwindow=temp[stimStart:stimEnd]
         stimwindow=stimwindow.astype(float)
-        print("stimwindow =",stimwindow)  
+        if debug:
+            print("stimwindow =",stimwindow)  
         tempmax=np.max(stimwindow)
         if debug and c%10==1:
             print(tempmax)
