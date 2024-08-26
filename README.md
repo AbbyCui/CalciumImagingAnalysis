@@ -216,3 +216,76 @@ Python 05MaxResponse.py
 Split normalization 
 ![image](https://github.com/user-attachments/assets/32614b02-f704-4443-80ba-4ba3a5aee915)
 
+
+GreedyEvent Detection
+----------------------------------------------------------------------
+''GreedyEventDetection''
+
+![image](https://github.com/user-attachments/assets/1a3f828c-4166-44fe-8121-ffc255c93183)
+
+DFF input and stims/thresholds
+![image](https://github.com/user-attachments/assets/02ba816e-7d6d-4244-b09d-db7b60b65bd8)
+
+First frame above threshold
+![image](https://github.com/user-attachments/assets/0dad6d62-d500-449d-9ef9-1ce14827f6cc)
+
+Once it reaches the spike duration (i.e. a certain number of frames/seconds above threshold
+if EventDuration > constant.spikeduration:
+
+![image](https://github.com/user-attachments/assets/4a64c712-0939-4988-b7b5-412f3f9ea33d)
+
+Then it decides that's a real event and it assigns the 1st frame above threshold as the star time of the event. 
+It is worth nothing that because the start time of the event is when it is above threshold there is some error in the timing of the events.
+e.g. if the threshold is 20% DFF but the event is slow to rise you may have a few frames of lag relative to the actual start of electrical activity. 
+This is especially true with Gcamp6s as it has a very slow rise time relative to Gcamp8.
+
+''if EventDuration > constant.spikeduration:  ##if the past 3 frames are 1s then start checking for the derivative as well as this is a valid event
+    if start > 0:
+       realstart=start''
+
+Now we also start checking for whether the supra threshold DFF is also increasing which is a sign of a discrete event. This requirement is that of the past 4 frames of suprathreshold frames they all need to have a positive derivative. This could be dropped to 3/4 frames (maybe for Gcamp8) but the derivative is additionally smoothed in order to track the general upward trend rather than an absolute t2-t1 type of requirement.
+If you need to change the smoothing it is located here. These values still preserve most of the temporal kinetics. This is smoothing the already once smoothed data (i.e. it take the smoothed input and smoothes it again)
+''DerivativeInput[1:,i] = signal.savgol_filter(data[1:,i],13, 2)'' 
+
+If the smoothing in the derivative still shows a negative trend, in 1 of the 4 frames, it would shift the window forward by 1 frame and then check the 4/4 positive again. Once all 4 frames are positive it writes the 1st frame of the 4 values which was positive as the start.
+This works fairly well because Gcamp6s is slow to rise and with 8hz sampling we regularly get 6-10 frames of positively trending activity. This will need to be adjusted depending on the indicator and sensor. 
+
+Once we have 4 frames above threshold and then 4 frames that are also positive we get our 'realstart' time
+'' if PositiveSlope < 4: #if the 4 frame are not all increasing, then it's a false start. Should match spike duration? Might not need to if 3/4 is ok''
+
+Once we're into this loop we're now looking for 3 consecutively negative frames to assign the stop of the the event. Again, this will be smeared due to the slow kinetics of Gcamp6s, but without deconvolution this is a safely conservative estimate.
+
+''if ConsecutiveNegativeFrames > 2: #Number of consecutive frames which need to have a negative slope to be considered the end of an event
+     end = y ##now that there have been 3 consecutively negative frames, this is the end of the event''
+
+
+In the above example, this cell has it's end point here, where the 3rd frame is negative. This will once again be FPS dependent. These are ~8hz recordings on gcamp6s.
+![image](https://github.com/user-attachments/assets/c9dbb22d-49f8-47c0-be70-8269a0e76d5f)
+
+This loop now resets that it's found an 'end' and we start looking for suprathreshold frames 
+''Starts[event,x] = realstart
+Ends[event,x] = end''
+
+Since we immediately find 4 frames above threshold, it goes into the 'check positive slope' loop, but fails bcause the prior 4 frames are also not sloped positive.
+![image](https://github.com/user-attachments/assets/53ff6dde-ba9d-4406-a00d-bc7ffa30baf2)
+
+We now roll our window forward 1 frame at a time checking if all frames in that window are positive until we find 4 frames that are positive, and now we have our 2nd event.
+![image](https://github.com/user-attachments/assets/5917a5a1-ba14-437f-a302-8b66b99f56d9)
+
+Repeat for the end to find 3 negative frames
+![image](https://github.com/user-attachments/assets/b7af3e4d-4c54-4aeb-8cab-1c063de42be1)
+
+Binary Response/Stim windows
+-------------------------
+To decide whether a cell responded to a particular stimuli we check the list of starts and stops that we just created.
+
+Using our example from above we detected 2 sets of starts and stops as shown here
+![image](https://github.com/user-attachments/assets/bed4e006-a816-4580-9442-ed151877973f)
+
+We go through our stimlist (which is a list of frame times as a start and stop, e.g. the event occured between frames 100 and 120) and find that a start was assigned during the window of Stim1 so we call it a responder, and find the peak response during the window. Similarly, we check during Stim2 for any starts and again, we find that there was a start which occured, so it's a responder. 
+
+It's important to note that if a Start is detected before the stim window it WILL NOT consider it a responder even if the amplitude is high during the window. This is why it is very important to have your stimulation times very accurately estimated because if you're stim times are a few frames off if could miss the 'start'. You can also fudge this by just adding 2-3 frames to each side of your stim window if you don't have frame-precise timing.
+ 
+
+ 
+
