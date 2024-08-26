@@ -1,4 +1,3 @@
-
 **Main**
 -----------------------------------------------------------------------------------
 
@@ -208,7 +207,7 @@ For all planes combined, the script will output 2 files
    This file computes mean, median, upper and lower limit of the 95% range of each frame within the timewindow for all selected cells from all planes.
 
 
-**Optional Improvements**
+**Improvements**
 -----------------------------------------------------------------------------------
 instead of running each script serially in the terminal you can run the 05 line of scripts which just runs each one in parallel. These assume 5 planes, but just add or remove tuples as necessary. This imroves the speed of processing by ~5x
 
