@@ -24,6 +24,6 @@ Inside the stimulus file, the 4th columm is the color of each stimuli. If nothin
 Valid colors are listed here for reference: https://matplotlib.org/stable/gallery/color/named_colors.html
 
 .. image:: https://user-images.githubusercontent.com/81972652/193975593-45dabde4-c088-4e3e-8855-711fdf6d69c0.png
-.. image:: (https://user-images.githubusercontent.com/81972652/193975635-80655606-2f26-4955-bbfb-c3f84e9053fc.png)
+.. image:: https://user-images.githubusercontent.com/81972652/193975635-80655606-2f26-4955-bbfb-c3f84e9053fc.png
 
 There is also a function to plot where each recording starts and stops. This is indicated by adding a CSV in the Data folder called Exp#_rec_length.csv. This CSV is just a single column which has the length of each recording. The ThorStackLengthFinder provides this information or you can do it manually. If the CSV is present, it will add a red line at the transitions between each recording. If you want to turn it off, just rename the CSV to something slightly else or set Rec_Splits=0 in Plot.py
