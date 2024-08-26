@@ -11,3 +11,7 @@ Contents
 --------
 
 .. toctree::
+
+   Home <self>
+   Main
+   Inputs
