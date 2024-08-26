@@ -7,31 +7,31 @@ These series of scripts takes raw data resulted from FIJI-multi-measure to basic
 ## Input data and Folder Structure
 Put all scripts in the same folder named whatever you like, e.g. "PythonScripts"
 
-.. image:: (https://user-images.githubusercontent.com/81972652/193971557-d39188fd-2f6d-4e63-a4ad-920e689eeda2.png)
+.. image:: https://user-images.githubusercontent.com/81972652/193971557-d39188fd-2f6d-4e63-a4ad-920e689eeda2.png
 
 For EACH experiment, make a copy of the folder PythonScripts and place it within a folder (e.g. exp#462). 
 
-.. image:: (https://user-images.githubusercontent.com/81972652/193971950-23060e2c-ea8c-49cc-b026-a2eef60a6295.png)
+.. image:: https://user-images.githubusercontent.com/81972652/193971950-23060e2c-ea8c-49cc-b026-a2eef60a6295.png
 
 Then create a folder called the same thing (Exp#462) and within it create a folder called "Data" that contains all results from multi-measure and a .csv file containing the timestamp of each stimuli. Results should be in csv format, and names as **"experimentNumber_PlaneNumber_Results.csv"**, and stimulus file should be named **"ExperimentNumber_Stimulus.csv"**, as shown below. The names of the ROIs (i.e. the first row) cannot have # in it, e.g. Exp#455_P2_001 and should be left as Mean1, Mean2, etc as the outputs will be renamed later.
 
-.. image:: (https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/3bd42cb4-339e-49d4-8b92-307d17e40546)
+.. image:: https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/3bd42cb4-339e-49d4-8b92-307d17e40546
 
 Inside the stimulus file, columm 1 is the name of each stimuli. **Do no include commas or #!** comma in csv files indicate "next cell" and will not be interpreted as a part of the text. The second and the third columns are the start and end of each stimulus (in frames). Fourth column is optional, and can be used to indicate the color you want the stimulus to be during plotting. If nothing is entered, all stimuli will be defult to grey. If you ever have weird errors e.g. blanks values being imported copy the 4 columns and x rows into a new CSV and save it. I've had it happen once or twice that there must have been some extraneous blank cells included in the CSV when excel saved.
 
-.. image:: (https://user-images.githubusercontent.com/109237711/191102579-89f5260f-a990-45d3-bac9-836168db52ed.png)
+.. image:: https://user-images.githubusercontent.com/109237711/191102579-89f5260f-a990-45d3-bac9-836168db52ed.png
 
 Inside the Threshold file you can mark which of the stimulations to include for the calculation of the Median threshold as well as mark which thresholds to set to the pharmthreshold. This will only be necessary if you are using varyingThreshold = False, i.e. if you want to specify which thresholds to include make sure the CSV exists.
 
-.. image:: (https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/42b90823-8c9b-448f-89fc-47684dcd9d19)
+.. image:: https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/42b90823-8c9b-448f-89fc-47684dcd9d19
 
 
 Valid colors are listed here for reference:
 https://matplotlib.org/stable/gallery/color/named_colors.html
 
-.. image:: (https://user-images.githubusercontent.com/81972652/193975593-45dabde4-c088-4e3e-8855-711fdf6d69c0.png)
+.. image:: https://user-images.githubusercontent.com/81972652/193975593-45dabde4-c088-4e3e-8855-711fdf6d69c0.png
 
-.. image:: (https://user-images.githubusercontent.com/81972652/193975635-80655606-2f26-4955-bbfb-c3f84e9053fc.png)
+.. image:: https://user-images.githubusercontent.com/81972652/193975635-80655606-2f26-4955-bbfb-c3f84e9053fc.png
 
 
 ## Establish Environment
@@ -43,16 +43,16 @@ Open constants.py, and read through the document and modify as desired for each 
 The following are the most important things to adjust
 Parent folder variable needs to be changed to whatever you named it earlier, e.g. #462
 
-.. image:: (https://user-images.githubusercontent.com/81972652/193972821-cced4f47-93ea-4f2b-8e4b-2951b8ccc33d.png)
+.. image:: https://user-images.githubusercontent.com/81972652/193972821-cced4f47-93ea-4f2b-8e4b-2951b8ccc33d.png
 
 Sampling rate 
 e.g. if your sampling rate is 8.46hz, then set the FPS to 8.46 and value of T should be: T = 1.0 / 8.46
 
-.. image:: (https://user-images.githubusercontent.com/81972652/193972751-314c8871-defc-4387-86ee-5be8a991a92d.png)
+.. image:: https://user-images.githubusercontent.com/81972652/193972751-314c8871-defc-4387-86ee-5be8a991a92d.png
 
 This is the time window for rolling normalizatoin. If you have very large and long lasting responses I recommend a longer window like 800 seconds, but that will permit some drift on a faster time scale. 2-400 seconds is generally ok, but for things like GRP without TTX 400 is better. Basically the rule of thumb is that the window should be much larger than any event, e.g. if you have a response which lasts 30s you need at least 60 seconds of window as a bare minimum. Complex ongoing activity greatly benefits from a larger window.
 
-.. image:: (https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/0984c137-8c70-48f5-bc4b-9aa88f431b22)
+.. image:: https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/0984c137-8c70-48f5-bc4b-9aa88f431b22
 
 
 
@@ -70,7 +70,7 @@ python ProcessData.py "#5" "P0"
 
 Running the script will output 3 data files in OutputData folder: 
 
-.. image:: (https://user-images.githubusercontent.com/109237711/191107721-b0e35ecc-655e-4ea9-ad7c-0ae2d2860685.png)
+.. image:: https://user-images.githubusercontent.com/109237711/191107721-b0e35ecc-655e-4ea9-ad7c-0ae2d2860685.png
 
 don't panic if the smoothed data seems 3 times larger in size than the original file! They have the exact same dimensions and number of cells, it's just that the numbers are stored differentl somehow, thus creating different sizes.
 
@@ -101,14 +101,14 @@ python Plot.py "P0" 1 "all" 800
 ```
 After you inspect the figures, you may choose to exclude some bad/dead/unhappy cells for future analysis. In that case, create a BadROIs.csv (named as something like #468_BadROIs.csv) in Data folder. This csv file should include any ROIs that you do not want to include for responder analysis. The first row should be the plane number, and following rows should be ROIs to exclude for each plane. The order of plane or ROIs does not matter, and for planes where no ROI need to be excluded, you don't need to create a column for that plane. 
 
-.. image:: (https://user-images.githubusercontent.com/109237711/196474386-454b9175-ed75-44d6-81a0-9896ef8a519f.png)
+.. image:: https://user-images.githubusercontent.com/109237711/196474386-454b9175-ed75-44d6-81a0-9896ef8a519f.png
 
 If you choose to do that, the Data folder will now look like 
 
-.. image:: (https://user-images.githubusercontent.com/109237711/196476310-63edfbbb-bca1-4104-9bfa-dcfe894223f0.png)
+.. image:: https://user-images.githubusercontent.com/109237711/196476310-63edfbbb-bca1-4104-9bfa-dcfe894223f0.png
 
 For visualization purposes, you can also only choose to plot selected ROI. This will require that you input a file named #expNumber_ROIsToInclude.csv (e.g. #40_ROIsToInclude.csv, in Data folder), which follows the same format as ROIsToRemove.csv. This file allows you to pull only the desired cells from each plane
-.. image:: (https://github.com/user-attachments/assets/cf1f7021-7704-4123-9710-09ef196cbf22)
+.. image:: https://github.com/user-attachments/assets/cf1f7021-7704-4123-9710-09ef196cbf22
 
 
 
@@ -126,10 +126,10 @@ python MaxResponse.py "P0"
  
 The first half of the output csv file will be like this, where each cell indicates the max amplitude for responders, and is 0 for non-responders
 
-.. image:: (https://user-images.githubusercontent.com/109237711/196473537-904b7e97-6420-48a4-9404-bf4f7b5d1328.png)
+.. image:: https://user-images.githubusercontent.com/109237711/196473537-904b7e97-6420-48a4-9404-bf4f7b5d1328.png
 
 The second half of the output will be like this, where each cell is 1 or 0 to indicate responder vs non-responder
-.. image:: (https://user-images.githubusercontent.com/109237711/196473883-5bb39907-19ef-4007-aecb-aeb3a0786451.png)
+.. image:: https://user-images.githubusercontent.com/109237711/196473883-5bb39907-19ef-4007-aecb-aeb3a0786451.png
 
 ## StitchFiles.py
 This script simply combines the same type of output data (e.g. maxResponse) for different planes into one single file. This script will arrange all files in the OutputData folder that ends with e.g. "MaxResponse", order them by their names (i.e. P0, P1, P2...), and combine the second file to the right side of the first file, then add the third file to the right side of the merged file etc. The first column (often header for stimuli name) will only appear once, and the first row containing ROI number will be changed so that each ROI will be associated with their individual planes (e.g. P0_Mean129,P1_Mean1).
@@ -144,26 +144,26 @@ python StitchFiles.py "#462" "MaxResponse"
 Rename20xAvg.py performs 20x average (or whatever averaging you'd like) on input csv and rename the ROI names from 'Mean34' to 'exp465_P0_034'. This script produces one output csv file for each plane.
 
 By default the script will grab the relevant information from the constant file as it will assume you're operating within the folder where it resides so input the number of planes and amount of averaging into the constant file.
-.. image:: (https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/8d4b41f5-5e4c-416b-a90d-f0714c409a63)
+.. image:: https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/8d4b41f5-5e4c-416b-a90d-f0714c409a63
 
 
 TemplateMatching.py takes in a csv file with only the header (first row containing ROI names for the desired ROIs) as template. This file can contain ROIs from different planes.
 
-.. image:: (https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/192f6641-776d-45bf-965c-396d9dba1ef5)
+.. image:: https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/192f6641-776d-45bf-965c-396d9dba1ef5
 
 this script also takes in the smoothed (or 20x averaged smoothed).csv for all of the planes that contain the desired ROIs
 
-.. image:: (https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/797e6cc2-6501-47a6-bcd9-697f451f3c1c)
+.. image:: https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/797e6cc2-6501-47a6-bcd9-697f451f3c1c
 
 then will output a csv containing the smoothed/20x smoothed data points for each selected ROIs. This will output one csv file for each template file.
 
-.. image:: (https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/edccc02f-044d-44fd-b42a-764337e679cf)
+.. image:: https://github.com/AbbyCui/CalciumImagingAnalysis/assets/109237711/edccc02f-044d-44fd-b42a-764337e679cf
 
 By default it will assume the location of the template that it uses for matching (i.e. the cells you want to pull out) is within the Data folder. It will then (by default) save those traces back to the output folder.
-.. image:: (https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/7d88f2eb-2fe9-47d1-b5ac-5f63e41bf9e8)
+.. image:: https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/7d88f2eb-2fe9-47d1-b5ac-5f63e41bf9e8
 
 You will need to specify the name of the file and it will name the output file the same name.
-.. image:: (https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/9a1e027c-1ca7-44b5-b47f-3b04118e6a1a)
+.. image:: https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/9a1e027c-1ca7-44b5-b47f-3b04118e6a1a
 
 ## Peri-Stimulus.py
 On a plane-by-plane basis: This script extract ROIs of interest at the time window of interest, extracts the data within the peri-stimulus window (output one file ending with "Peri-stim"), and calculate mean, median, 95% range for each frame (output another file ending with "avg Peri-stim"), 
@@ -173,7 +173,7 @@ Then, the script stitches the "avg Peri-stim.cvs" from all planes together, and 
 1. Smoothed.csv (in OutputData folder)
 2. Stimulus.csv (in Data folder)
 3. #expNumber_ROIsToInclude.csv (e.g. #40_ROIsToInclude.csv, in Data folder), which follows the same format as ROIsToRemove.csv. This file allows you to pull only the desired cells from each plane
-.. image:: (https://github.com/user-attachments/assets/cf1f7021-7704-4123-9710-09ef196cbf22)
+.. image:: https://github.com/user-attachments/assets/cf1f7021-7704-4123-9710-09ef196cbf22
 
 **Input info**
 
@@ -193,12 +193,12 @@ For each plane, the script will output 2 files
 1. full Peri-stim *postfix of your choosing* (e.g.#40_P0_full Peri-stim test)
 
    this file simply crops out the time window before and after stimulus
-   .. image:: (https://github.com/user-attachments/assets/e82e04de-2925-4348-bc80-7dc29b0d090d)
+   .. image:: https://github.com/user-attachments/assets/e82e04de-2925-4348-bc80-7dc29b0d090d
 
 3. avg Peri-stim *postfix of your choosing* (e.g.#40_P0_avg Peri-stim test)
 
    this file calculates the mean, median, upper and lower limit of the 95% range of each frame within the timewindow.
-.. image:: (https://github.com/user-attachments/assets/c1bda973-f880-4c93-96bd-f3915c09aa7c)
+.. image:: https://github.com/user-attachments/assets/c1bda973-f880-4c93-96bd-f3915c09aa7c)
 
 For all planes combined, the script will output 2 files
 1. stitching "full Peri-stim" file from all planes together -> e.g #40_full Peri-stim test_Stitched
@@ -211,7 +211,7 @@ Improvements
 -----------------------------------------------------------------------------------
 instead of running each script serially in the terminal you can run the 05 line of scripts which just runs each one in parallel. These assume 5 planes, but just add or remove tuples as necessary. This imroves the speed of processing by ~5x
 
-.. image:: (https://github.com/user-attachments/assets/a1781faa-00c1-4cb8-a452-ec54eeafefe1)
+.. image:: https://github.com/user-attachments/assets/a1781faa-00c1-4cb8-a452-ec54eeafefe1
 
 The 05Plot.py has the relevant variables for specifying the range and SPI at the top of the file. 
 
