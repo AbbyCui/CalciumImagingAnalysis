@@ -1,8 +1,9 @@
 import multiprocessing
 import subprocess
+import constant as constant
 
 def run_script(script_args):
-    """Function to run a script using subprocess with arguments"""
+
     script_name, args = script_args
     # Construct the command with the script and arguments
     command = ['python', script_name] + args
@@ -24,3 +25,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+exp=str(constant.parentFolder)
+exp ='"'+ exp + '"'
+command2 = "python StitchFiles.py " + exp + ' "MaxResponse"'
+subprocess.run(command2, check=True)
