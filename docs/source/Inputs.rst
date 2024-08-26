@@ -1,13 +1,11 @@
 Inputs
-===
+=======================
 This page documents the inputs in the Data Folder
 
-.. _Fluorescence Traces:
-
+Fluorescence Traces:
 -----------------------------------------------------------------------------------
 You will need to input some CSVs
 
-.. _Stimulus Files
-
+Stimulus Files
 -----------------------------------------------------------------------------------
 More CSVs are necesssary
