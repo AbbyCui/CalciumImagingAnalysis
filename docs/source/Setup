@@ -13,6 +13,10 @@ For EACH experiment, make a copy of the folder PythonScripts and place it within
 
 .. image:: https://user-images.githubusercontent.com/81972652/193971950-23060e2c-ea8c-49cc-b026-a2eef60a6295.png
 
+Then create a folder called the same thing (Exp#462) and within it create a folder called "Data" that contains all the raw inputs and metadata. 
+
+We will go over more about inputs after setting up python.
+
 Establish Environment
 -----------------------------------------------
 Please make sure python is installed in computer and the IDE you're using, and install all packages in Requirement.txt by pasting the file in terminal. 
