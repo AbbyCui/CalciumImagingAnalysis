@@ -11,6 +11,3 @@ Contents
 --------
 
 .. toctree::
-
-   Main
-   FormattingExamples
