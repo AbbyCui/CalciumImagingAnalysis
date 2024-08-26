@@ -1,4 +1,4 @@
-**Main**
+Main
 ===
 
 # Calcium Imaging Analysis
@@ -56,7 +56,7 @@ This is the time window for rolling normalizatoin. If you have very large and lo
 
 
 
-**Proccess Data**
+.. _Proccess Data:
 -----------------------------------------------------------------------------------
 This script needs to be run before any other are ran. 
 This script imports raw data, normalize, smooth, then calculate the threshold for each ROI, the actual threshold of response can vary depending on your experiment. For cutaneous stimuli an amplitude of 0.2 and baselineMean+7xSD works fairly well, but then for pharmacologic stimuli a threshold o 0.3 seems to be more reasonable.
