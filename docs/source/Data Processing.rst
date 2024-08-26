@@ -17,11 +17,9 @@ Running the script will output 3 data files in OutputData folder:
 
 .. image:: https://user-images.githubusercontent.com/109237711/191107721-b0e35ecc-655e-4ea9-ad7c-0ae2d2860685.png
 
-GreedyEvent Detection
+Greedy Event Detection
 ----------------------------------------------------------------------
-``GreedyEventDetection``
-
-Here we will go through the broad strokes of how GreedyEventDetection works. I will reference the code sparsley, but this is mostly to explain the logic behind the code rather than the code's workings.
+Here we will go through the broad strokes of how ``extractEventGreedy`` works. I will reference the code sparsley, but this is mostly to explain the logic behind the code rather than the code's workings.
 
 Our example cell with the DFF and stims/thresholds indicated
 
