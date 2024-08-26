@@ -212,3 +212,7 @@ It should be possible to stack these to run the whole pipeline at once, e.g. pas
 Python 05ProcessData.py
 Python 05Plot.py
 Python 05MaxResponse.py
+
+Split normalization 
+![image](https://github.com/user-attachments/assets/32614b02-f704-4443-80ba-4ba3a5aee915)
+
