@@ -239,9 +239,9 @@ It is worth nothing that because the start time of the event is when it is above
 e.g. if the threshold is 20% DFF but the event is slow to rise you may have a few frames of lag relative to the actual start of electrical activity. 
 This is especially true with Gcamp6s as it has a very slow rise time relative to Gcamp8.
 
-''if EventDuration > constant.spikeduration:  ##if the past 3 frames are 1s then start checking for the derivative as well as this is a valid event
+``if EventDuration > constant.spikeduration:  ##if the past 3 frames are 1s then start checking for the derivative as well as this is a valid event
     if start > 0:
-       realstart=start''
+       realstart=start``
 
 Now we also start checking for whether the supra threshold DFF is also increasing which is a sign of a discrete event. This requirement is that of the past 4 frames of suprathreshold frames they all need to have a positive derivative. This could be dropped to 3/4 frames (maybe for Gcamp8) but the derivative is additionally smoothed in order to track the general upward trend rather than an absolute t2-t1 type of requirement.
 If you need to change the smoothing it is located here. These values still preserve most of the temporal kinetics. This is smoothing the already once smoothed data (i.e. it take the smoothed input and smoothes it again)
@@ -255,16 +255,19 @@ Once we have 4 frames above threshold and then 4 frames that are also positive w
 
 Once we're into this loop we're now looking for 3 consecutively negative frames to assign the stop of the the event. Again, this will be smeared due to the slow kinetics of Gcamp6s, but without deconvolution this is a safely conservative estimate.
 
-''if ConsecutiveNegativeFrames > 2: #Number of consecutive frames which need to have a negative slope to be considered the end of an event
-     end = y ##now that there have been 3 consecutively negative frames, this is the end of the event''
+``if ConsecutiveNegativeFrames > 2: #Number of consecutive frames which need to have a negative slope to be considered the end of an event
+     end = y ##now that there have been 3 consecutively negative frames, this is the end of the event``
 
 
 In the above example, this cell has it's end point here, where the 3rd frame is negative. This will once again be FPS dependent. These are ~8hz recordings on gcamp6s.
 ![image](https://github.com/user-attachments/assets/c9dbb22d-49f8-47c0-be70-8269a0e76d5f)
 
 This loop now resets that it's found an 'end' and we start looking for suprathreshold frames 
-''Starts[event,x] = realstart
-Ends[event,x] = end''
+``Starts[event,x] = realstart
+Ends[event,x] = end``
+
+![image](https://github.com/user-attachments/assets/01afd90f-9749-4052-831d-6b9877193e71)
+
 
 Since we immediately find 4 frames above threshold, it goes into the 'check positive slope' loop, but fails bcause the prior 4 frames are also not sloped positive.
 ![image](https://github.com/user-attachments/assets/53ff6dde-ba9d-4406-a00d-bc7ffa30baf2)
