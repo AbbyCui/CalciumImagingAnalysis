@@ -16,6 +16,8 @@ The y-axis is a static value (yaxismax=3) in order to keep each ROI in the same 
 For reference, 400 seconds per inch with a 1 point weight lines is the minimum resolution which is well resolved for VF counting. 0.5 to 0.75 weight was better (along with 200s/i) , but the non-zoomed imaged for quickly flipping through didn't render well in Adobe Bridge due to the aliasing of the massive resolution from 20000 pixels down to 1920. So maybe run it twice passing different sub sections through if you want higher x-axis resolution for some sections of especially long recordings, e.g. >4 hours (my test case is ~18000 seconds or 150,000 time points) `
 python Plot.py "P0" 1 "all" 800
 
+Sub population plotting
+------------------
 For visualization purposes, you can also only choose to plot selected ROI. This will require that you input a file named #expNumber_ROIsToInclude.csv (e.g. #40_ROIsToInclude.csv, in Data folder), which follows the same format as ROIsToRemove.csv. This file allows you to pull only the desired cells from each plane
 
 .. image:: https://github.com/user-attachments/assets/cf1f7021-7704-4123-9710-09ef196cbf22
