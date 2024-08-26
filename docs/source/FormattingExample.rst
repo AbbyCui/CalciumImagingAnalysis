@@ -21,7 +21,7 @@ you can use the ________ function:
 .. ##do code things
 
 The ``kind`` parameter should be either ``"meat"``, ``"fish"``,
-or ``"veggies"``. Otherwise, :py:func:`lumache.get_random_ingredients`
+or ``"veggies"``. Otherwise, this function will
 will raise an exception.
 
 .. ##do code things
