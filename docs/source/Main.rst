@@ -112,7 +112,7 @@ For visualization purposes, you can also only choose to plot selected ROI. This 
 
 
 
-*Max Response**
+**Max Response**
 -----------------------------------------------------------------------------------
 Summarizes the max amplitude of each cell's response to each stimuli. If the cell doesn't reach threshold for the entire duration of the stimulus, amplitude will be 0.
 Also will summarize which cell is a responder to each stimuli where 1 indicate responder, and 0 indicate non-responder (never reached threshold in this stimulus window).
