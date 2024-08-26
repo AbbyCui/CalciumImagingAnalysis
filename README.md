@@ -3,7 +3,7 @@ These series of scripts takes raw data resulted from FIJI-multi-measure to basic
 # Read the Docs!
 https://calciumimaginganalysis.readthedocs.io/en/latest/
 
-The readme here is deprecited and will soon be slimmed down in favor of ReadTheDocs. 
+The readme here is deprecated and we have moved towards ReadTheDocs for any future updates. 
 
 ## Input data and Folder Structure
 Put all scripts in the same folder named whatever you like, e.g. "PythonScripts"
