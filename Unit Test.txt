@@ -1,17 +1,24 @@
 #run the following in terminal 
 python path/to/pythonFile, path/to/dataFile
 
+If you want to run all planes at the same time (i.e. using multiple CPU cores) utilize the 05ProcessData.py series of scripts
+e.g. you could run these 3 commands and run the entire pipeline parallelized by plane. Just make sure that 05plot.py is set for the right range that you're looking for, e.g. the entire recording and size/SPI
+    python 05ProcessData.py
+    python 05Plot.py
+    python 05MaxResponse.py
+    "finished"
+
 Run these commands all at once (make sure to include a return at the end)
     python ProcessData.py "P0"
     python ProcessData.py "P1"
     python ProcessData.py "P2"
     python ProcessData.py "P3"
+    python ProcessData.py "P4"   
     "finished"
 
 # raw screening of bad ROIs, also get a sense of how to analyze
-    plot.py P0 5000 10000  (this plots frames 5000 to 10000)
-   Input arguments are: Plot.py ["plane"] [start] [stop]
-    python ProcessData.py "P0"
+    plot.py "P0" 5000 10000  (this plots frames 5000 to 10000)
+    Input arguments are: Plot.py ["plane"] [start] [stop] optional: [secondsperinch]
     python Plot.py "P0" 1 all
     python Plot.py "P1" 1 all
     python Plot.py "P2" 1 all
@@ -19,13 +26,12 @@ Run these commands all at once (make sure to include a return at the end)
     python Plot.py "P4" 1 all
     "finished"
 
-    secondsperinch (100-800 are good numbers). Default is 800, but you can change it in the constant file if desired
+    secondsperinch (100-800 are good numbers). Default is 400, but you can pass a different number as a 4th argument or use the 05Plot and change it there.
 
 
 # manually remove ROIs with too much z-drift, or dead ones
 # (put ROI number of the bad ROIs in an excel sheet, with "P0", 
 # "P1" etc as first row, then ROI numbers in the corresponding columns)
-# this function can also do AUC now, check the constant file enable or disable features
 
     python MaxResponse.py "P0"
     python MaxResponse.py "P1"
@@ -69,15 +75,20 @@ Python TemplateMatching.py "500_Control GRPR Neg Int"
     python Peri-Stimulus.py "P4"
     python StitchFiles.py "#40" "full Peri-stim test"
 
+
 # some free area for you to organize and copy-paste your pipeline
     python ProcessData.py "P0"
-    python Plot.py "P0" 1 all
-
     python ProcessData.py "P1"
     python ProcessData.py "P2"
     python ProcessData.py "P3"
     python ProcessData.py "P4"
+    python Plot.py "P0" 1 all
     python Plot.py "P1" 1 all
     python Plot.py "P2" 1 all
     python Plot.py "P3" 1 all
     python Plot.py "P4" 1 all
+    python MaxResponse.py "P0"
+    python MaxResponse.py "P1"
+    python MaxResponse.py "P2"
+    python MaxResponse.py "P3"
+    python MaxResponse.py "P4"
