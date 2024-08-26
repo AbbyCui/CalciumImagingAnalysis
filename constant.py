@@ -5,73 +5,55 @@ from scipy import signal
 import numpy as np
 
 ##################################### BELOW ARE THE MOST IMPORTANT VARIABLES TO MODIFY#####################
+"""MetaData"""
+parentFolder = "#518" #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
+fps = 8.516436723 #Frame per second for the experiment (used only in Plot.py)
 
-#set debug to True to show all debugging statements, and set to False to hide all (also saves time)
-debug = False
-debugCSV = False ##this is just outputting the various other CSVs for debugging or checking, e.g. Event Start and Stop Times, good/bad thresholds, etc
-#set varyingThreshold to have different threshold for each stimuli for each ROI (e.g. 3 ROI x 5 stimuli = 15 different thresholdds)
+"""Normalization settings"""
+ThresholdsOnly=0 ##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
+timewindow = 400 #This is the window for rolling ball normalization in seconds
+#For a normal recording ~3-400 seconds is fine. For things that last a long time or have prolonged elevations in calcium (4880/GRP) 800 seconds or more seems to be necessary.
+percentile=30 #percentile of window for normalization ##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. 
+splitnorm=1 ##function to normalize individual recordings to help with changes in brightness between sessions 
+
+"""Smoothing"""
+window_size = 15 #window size for smoothing. Larger is more smooth
+polynomial = 3 #polynomial order for smoothing. Smaller is more smooth
+# Choose something on the same scale as your events
+# e.g. if a transient peak lasts around 30 frames, 15 is a good starting point.
+
+"""Event Detection settings"""
 varyingThreshold = False ##set to True to have each stimulation have it's own distinct threshold (not recommended)
+threshold = 0.2 # signal above threshold are considered an event
 pharmthreshold = 0.3 ##this is a secondary threshold which you can use to differentiate cutaneous vs pharmacological stimuli
-# signal above threshold are considered an event
-threshold = 0.2
-##Threshold for SD 
-SD=7
-##Output a third sheet which contains the max amp of all stims regardless of threshold (mostly for finding/validating thresholds)
-MaxAll=True
-##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
-ThresholdsOnly=0
+SD=5 ##Threshold for SD 
 
-##This uses the Events (starts/stops) to find events and then only calculates AUC of the detected events
-#of note, the AUC will be limited to the stimwindow, i.e. if the decay/calcium lasts longer than the window it will underestimate the AUC
-DO_AUC=True
+spikeduration=3 #minimum width of event to be considered a response. Needs to be changed for frame rates other than ~8hz
+#Note that this is the width, not the number of frames. e.g. there are 4 frames above threshold (e.g. frame 100 (start) through 103 (end)) but, the end-start=3 and this is what this is checking.
+#Spike duration of 4 can work well for pharmacology, but should be reduced for natural stimulations. Also consider the frame rate in this, e.g. around a 350ms duration for natural stims seems reasonable (~4 frames at 8hz) but lower FPS means 4 frames at 4hz twice as long.
+
+"""Analysis/Quantification Settings"""
+MaxAll=True ##Output a third sheet which contains the max amp of all stims regardless of threshold (mostly for finding/validating thresholds)
+
+DO_AUC=True##This uses the Events (starts/stops) to find events and then only calculates AUC of the detected events
 AUC_norm=False ##whether to divide the total AUC by the duration of stim window (in minutes, so it's AUC/minute)
+#of note, the AUC will be limited to the stimwindow, i.e. if the decay/calcium lasts longer than the window it will underestimate the AUC
 
-#folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
-parentFolder = "#465"
-
-#Frame per second for the experiment (used only in Plot.py)
-fps = 6.53
-# sample spacing
-T = 1.0 / fps # 8Hz
-##Amount of averaging to do (relates to Rename20xavg script and tempalte matching)
-Avg_c = 6
+Avg_c = 6 ##Amount of averaging to do (relates to Rename20xavg script and tempalte matching)
 minPlane = 1 #1st plane which is present. Use literal nubmers, e.g. Plane0=0 and Plane 1=1
 maxPlane = 4  #last plane which is present
 
+"""__________________Other variables___________________"""
+#set debug to True to show all debugging statements, and set to False to hide all (also saves time)
+debug = False
+debugCSV = False ##this is just outputting the various other CSVs for debugging or checking, e.g. Event Start and Stop Times, good/bad thresholds, etc
 
-#window for normalization
-#For a normal recording ~3-400 seconds is fine. For things that last a long time or have prolonged elevations in calcium (4880/GRP) 800 seconds or more seems to be necessary.
-timewindow = 400 #This is in seconds
-window = (round(timewindow*fps)) #This converts the seconds to frames
-#percentile of window for normalization
-percentile=40 ##depending on how active your cells are, anything from the 5th to 30th percentile is usually fine. 
-splitnorm=1 ##function to normalize individual recordings to help with changes in brightness between sessions 
-
-
-#window size for smoothing
-# this is the window in which the polynomial fits. Larger numbers are more smooth, 
-# but can decrease the height of transient peaks. Choose something on the same scale as your events, 
-# e.g. if a transient peak lasts around 30 frames, 15 is a good starting point.
-window_size = 15
-#polynomial order for smoothing
-#this is the order of polynomial used for smoothing. 
-# Bigger numbers fit the curve more closely (i.e. less smooth, but more accurate)
-polynomial = 3
-
+"""Plotting settings"""
 #Size of graph created by Plot.py
 SecondsPerInch=400 
 ##you can go as low as 800 for a compact graph but it'll be hard to read.
 # ~300 the bare minimum for 15s VF spacing, but tight, ~50-100 would be better. C
 # CICADA is totally readable at 800
-
-#minimum width of event to be considered a response
-#Spike duration of 4 can work well for pharmacology, but should be reduced for natural stimulations. Also consider the frame rate in this, e.g. around a 350ms duration for natural stims seems reasonable (~4 frames at 8hz) but lower FPS means 4 frames at 4hz twice as long.
-#Note that this is the width, not the number of frames. e.g. there are 4 frames above threshold (e.g. frame 100 (start) through 103 (end)) but, the end-start=3 and this is what this is checking.
-spikeduration=3
-
-
-
-#__________________Other variables___________________#
 
 #to be added to each file name
 planeNumber= "P0"
@@ -97,7 +79,7 @@ ROIs = 'all'
 
 ######### for SpikePattern.py ###########
 #user-defined index of stimulus to look at (based off of stimulus.csv). 
-stimIndex = 19
+stimIndex = 1
 
 ##############################################################################################################
 
@@ -124,3 +106,8 @@ splPrefix = expNumber + "_" + planeNumber+ "_"
 
 #Design a digital low-pass filter at 4Hz to remove frequencies faster than 4Hz
 sos = signal.butter(N = 10,Wn = 4, btype = 'lowpass', fs=8.2, output='sos') 
+
+window = (round(timewindow*fps)) #This converts the seconds to frames
+
+# sample spacing
+T = 1.0 / fps # 8Hz
