@@ -56,7 +56,9 @@ This is the time window for rolling normalizatoin. If you have very large and lo
 ![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/0984c137-8c70-48f5-bc4b-9aa88f431b22)
 
 
-## ProcessData.py
+
+**Proccess Data**
+-----------------------------------------------------------------------------------
 This script needs to be run before any other are ran. 
 This script imports raw data, normalize, smooth, then calculate the threshold for each ROI, the actual threshold of response can vary depending on your experiment. For cutaneous stimuli an amplitude of 0.2 and baselineMean+7xSD works fairly well, but then for pharmacologic stimuli a threshold o 0.3 seems to be more reasonable.
 
@@ -110,7 +112,9 @@ For visualization purposes, you can also only choose to plot selected ROI. This 
 ![image](https://github.com/user-attachments/assets/cf1f7021-7704-4123-9710-09ef196cbf22)
 
 
-## MaxResponse.py
+
+*Max Response**
+-----------------------------------------------------------------------------------
 Summarizes the max amplitude of each cell's response to each stimuli. If the cell doesn't reach threshold for the entire duration of the stimulus, amplitude will be 0.
 Also will summarize which cell is a responder to each stimuli where 1 indicate responder, and 0 indicate non-responder (never reached threshold in this stimulus window).
 
