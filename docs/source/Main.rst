@@ -1,5 +1,5 @@
 Main
-===
+====================
 
 # Calcium Imaging Analysis
 These series of scripts takes raw data resulted from FIJI-multi-measure to basic figures, analysis of ISI, max response during each stimuli and responders to each stimuli
@@ -56,7 +56,7 @@ This is the time window for rolling normalizatoin. If you have very large and lo
 
 
 
-.. _Proccess Data:
+Proccess Data
 -----------------------------------------------------------------------------------
 This script needs to be run before any other are ran. 
 This script imports raw data, normalize, smooth, then calculate the threshold for each ROI, the actual threshold of response can vary depending on your experiment. For cutaneous stimuli an amplitude of 0.2 and baselineMean+7xSD works fairly well, but then for pharmacologic stimuli a threshold o 0.3 seems to be more reasonable.
@@ -112,7 +112,7 @@ For visualization purposes, you can also only choose to plot selected ROI. This 
 
 
 
-**Max Response**
+Max Response
 -----------------------------------------------------------------------------------
 Summarizes the max amplitude of each cell's response to each stimuli. If the cell doesn't reach threshold for the entire duration of the stimulus, amplitude will be 0.
 Also will summarize which cell is a responder to each stimuli where 1 indicate responder, and 0 indicate non-responder (never reached threshold in this stimulus window).
@@ -207,7 +207,7 @@ For all planes combined, the script will output 2 files
    This file computes mean, median, upper and lower limit of the 95% range of each frame within the timewindow for all selected cells from all planes.
 
 
-**Improvements**
+Improvements
 -----------------------------------------------------------------------------------
 instead of running each script serially in the terminal you can run the 05 line of scripts which just runs each one in parallel. These assume 5 planes, but just add or remove tuples as necessary. This imroves the speed of processing by ~5x
 
