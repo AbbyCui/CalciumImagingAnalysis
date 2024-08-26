@@ -2,7 +2,7 @@ Inputs
 =======================
 This page documents the inputs in the Data Folder
 
-Fluorescence Traces:
+Fluorescence Traces
 -----------------------------------------------------------------------------------
 You will need to input some CSVs
 
