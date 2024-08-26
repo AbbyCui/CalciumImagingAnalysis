@@ -1,4 +1,4 @@
-.. _Main
+**Main**
 ===
 
 # Calcium Imaging Analysis
