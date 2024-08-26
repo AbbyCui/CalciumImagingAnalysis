@@ -15,3 +15,4 @@ Contents
 
    Main
    Inputs
+   Plotting
