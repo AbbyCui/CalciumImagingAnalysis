@@ -17,6 +17,7 @@ For reference, 400 seconds per inch with a 1 point weight lines is the minimum r
 python Plot.py "P0" 1 "all" 800
 
 For visualization purposes, you can also only choose to plot selected ROI. This will require that you input a file named #expNumber_ROIsToInclude.csv (e.g. #40_ROIsToInclude.csv, in Data folder), which follows the same format as ROIsToRemove.csv. This file allows you to pull only the desired cells from each plane
+
 .. image:: https://github.com/user-attachments/assets/cf1f7021-7704-4123-9710-09ef196cbf22
 
 Inside the stimulus file, the 4th columm is the color of each stimuli. If nothing is entered, all stimuli will be defult to grey. If you ever have weird errors e.g. blanks values being imported copy the 4 columns and x rows into a new CSV and save it. I’ve had it happen once or twice that there must have been some extraneous blank cells included in the CSV when excel saved.
