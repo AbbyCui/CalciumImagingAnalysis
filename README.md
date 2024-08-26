@@ -1,5 +1,9 @@
 # Calcium Imaging Analysis
 These series of scripts takes raw data resulted from FIJI-multi-measure to basic figures, analysis of ISI, max response during each stimuli and responders to each stimuli
+# Read the Docs!
+https://calciumimaginganalysis.readthedocs.io/en/latest/
+
+The readme here is deprecited and will soon be slimmed down in favor of ReadTheDocs. 
 
 ## Input data and Folder Structure
 Put all scripts in the same folder named whatever you like, e.g. "PythonScripts"
