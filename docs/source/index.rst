@@ -12,7 +12,7 @@ Contents
 
 .. toctree::
 
-
-   Main
    Inputs
+   Data Processing
    Plotting
+   Analysis Tools
