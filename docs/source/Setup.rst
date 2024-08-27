@@ -7,6 +7,8 @@ Input data and Folder Structure
 ------------------------------------
 Put all scripts in the same folder named whatever you like, e.g. "PythonScripts"
 
+we also have an Demo Pipeline available to make sure everything is working
+
 .. image:: https://user-images.githubusercontent.com/81972652/193971557-d39188fd-2f6d-4e63-a4ad-920e689eeda2.png
 
 For EACH experiment, make a copy of the folder PythonScripts and place it within a folder (e.g. exp#462). 
