@@ -22,6 +22,7 @@ Establish Environment
 Please make sure python is installed in computer and the IDE you're using, and install all packages in Requirement.txt by pasting the file in terminal. 
 
 .. code-block:: terminal pip install item 1 2 3 4
+.. ##do code things
 
 E.g. download Visual Studio Code and make sure python is installed and then do File>open folder and find your exp# folder to load in the scripts.
 
