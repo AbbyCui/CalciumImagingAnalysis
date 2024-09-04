@@ -23,10 +23,12 @@ def main():
     with multiprocessing.Pool(processes=len(scripts_with_args)) as pool:
         pool.map(run_script, scripts_with_args)
 
+    # After all scripts have finished, stitch them together
+    exp=str(constant.parentFolder)
+    exp ='"'+ exp + '"'
+    command2 = "python StitchFiles.py " + exp + ' "MaxResponse"'
+    subprocess.run(command2, check=True)
+
+
 if __name__ == '__main__':
     main()
-
-exp=str(constant.parentFolder)
-exp ='"'+ exp + '"'
-command2 = "python StitchFiles.py " + exp + ' "MaxResponse"'
-subprocess.run(command2, check=True)
