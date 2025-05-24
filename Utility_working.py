@@ -490,7 +490,7 @@ def getAllThresholds(debug,data,stim,fps,threshold):
             if MStim in RowsToIncludeForPharm:
                 for i in range(1,x):
                     thisThreshold = AllThresholds[MStim,i]
-                    if thisThreshold<constant.pharmthreshold:
+                    if thisThreshold<0.3:
                         AllThresholds[MStim,i]=constant.pharmthreshold
                 if debug:
                     print("shape of temp",temp.shape)
@@ -656,7 +656,7 @@ def extractEventGreedy(debug,data,stim,AllThresholds):
     
     i=1
     while i< num_cols: #loop for each ROI (except for the first column of frames)
-        DerivativeInput[1:,i] = signal.savgol_filter(data[1:,i],13, 2) #This parameter will definitely need to be altered to other frame rates. 0th order with few neighboors is simliar to a 2nd order with 8ish, didn't seem to matter much. 
+        DerivativeInput[1:,i] = signal.savgol_filter(data[1:,i],((constant.spikeduration*2)+1), 0) #Smoothing at roughly the minimum spike duration is a reasonable start
         i+=1
 
     if constant.debugCSV:
@@ -701,7 +701,13 @@ def extractEventGreedy(debug,data,stim,AllThresholds):
         ConsecutiveNegativeFrames = 0
         for y in range(1,ys): #for each frame in this ROI
             thisData = float(data[y,x]) #extract raw data and change to float, this is the entire Trace for a single ROI
-            thisDerivative=float(Derivative[y,x]) ##extract the corresponding derivative of the same trace
+            try: 
+                thisDerivative=float(Derivative[(y-constant.spikeduration),x]) ##extract the corresponding derivative of the same trace. We are grabbing the an offset of the derivative because it is smoothed
+            except:
+                thisDerivative=float(Derivative[y,x])
+            #the -2 offset of the derivative may or may not be necessary. The Derivative is smoothed with a 9ish window rolling ball so the 'onset' of the positive derivative is smeared in time
+            #The smeared offset means that for short and fast events (e.g. ~4-5 frames above threshold) we are missing half of the positive derivative.
+            #I've set the offest to be -2 as a test, has not been optimized, could be up to 1/2 of the smoothing window, e.g. smoothed by 6 on each side, would be n-6.
             #determine threshold based on which stimuli this current frame is in. This Looks at the frame (e.g. the 3500th frame) and checks if it falls between the start and stop of each specified stim
             for i in range(s,stimNum):
                 if y >= float(stim[i,1]) and y <= float(stim[i,2]): ##does this frame fall within the range of a start stop
@@ -717,8 +723,8 @@ def extractEventGreedy(debug,data,stim,AllThresholds):
             if thisData>thisThreshold:
                 try:
                     spikesInOnes[y,x] = 1
-                    if y>1:
-                        if int(spikesInOnes[y-1,x]) == 0: # if the prior frame is 0 (smaller than threshold)
+                    if y>1:#The reason for this is that you can't check the -1th array, so it skips the first data point and only checks starting on the 2nd
+                        if int(spikesInOnes[y-1,x]) == 0: # if the prior frame is 0 (smaller than threshold), reset all durations and start over on the tracking
                             start = y
                             EventDuration = 1
                             NegativeSlope = 0
@@ -727,33 +733,36 @@ def extractEventGreedy(debug,data,stim,AllThresholds):
                             realstart = 0
                             if debug:
                                 print("Start is assigned at Current frame",y,"prior frame is a 0",thisData,"at ROI/column",x)
-                        else:
+                        else: #otherwise, check if the slope is going up or down and add that to the running total
                             if thisDerivative > 0:
                                 PositiveSlope = PositiveSlope + 1
                             else:
                                 NegativeSlope = NegativeSlope + 1
                             EventDuration = EventDuration + 1 ## for each frame that stays above threhsold, this goes up
 
-                        if EventDuration > constant.spikeduration:  ##if the past 3 frames are 1s then start checking for the derivative as well as this is a valid event
+                        if EventDuration > constant.spikeduration:  ##if the past 3 frames are above threshold then start checking for the derivative as well as this is a valid event
                             if start > 0:
                                 realstart=start
                             if debug:
                                 print("there was an event with more than 4 frames at this ROI and Frame",x,y)
-                            if PositiveSlope < 4: #if the 4 frame are not all increasing, then it's a false start. Should match spike duration? Might not need to if 3/4 is ok
-                                if float(Derivative[y-3,x]) > 0:
+                            if PositiveSlope < (constant.spikeduration+1):#4 frames in total for 3 spike duration. #if the prior 4 frames are not all increasing, then it's a false start, probably noise. 
+                                #since this is not a real start, we roll the window forward which means removing the oldest data point
+                                if float(Derivative[y-((2*constant.spikeduration)+1),x]) > 0: #check what the oldest derivative frame was, and remove it from the running total. #spikeduration+1 is the window, and the 2nd spike duration is the smoothing offset
                                     PositiveSlope = PositiveSlope - 1
                                 else:
                                     NegativeSlope = NegativeSlope - 1
                                 EventDuration = EventDuration - 1
-                            else:
-                                if PositiveSlope==4:
-                                    realstart=y-3
-                                if thisDerivative < 0:
-                                    if float(Derivative[y-1,x]) < 0:
+                            else: #there are more than 4 positive frames and this is now a real event despite it remaining above absolute threshold
+                                if PositiveSlope==(constant.spikeduration+1): #if this is the window which broke threshold, assign the start 
+                                    realstart=y #bc of the smoothing being about the same as the window, they kind of cancel each other out. 
+                                    if debug:
+                                        print("Positive slope was exactly equal to 4 at ROI and Frame",x,y)
+                                if thisDerivative < 0: #here now we're starting to check for where the event ends
+                                    if float(Derivative[y-(constant.spikeduration-1),x]) < 0:
                                         ConsecutiveNegativeFrames = ConsecutiveNegativeFrames + 1
                                     else:
                                         ConsecutiveNegativeFrames = 0
-                                    if ConsecutiveNegativeFrames > 2: #Number of consecutive frames which need to have a negative slope to be considered the end of an event
+                                    if ConsecutiveNegativeFrames > (constant.spikeduration-1): #Number of consecutive frames which need to have a negative slope to be considered the end of an event
                                         end = y ##now that there have been 3 consecutively negative frames, this is the end of the event
                                         #after a spike ends, add start and finish to startsAndEnds as a tuple
                                         if debug:
