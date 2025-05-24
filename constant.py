@@ -6,8 +6,8 @@ import numpy as np
 
 ##################################### BELOW ARE THE MOST IMPORTANT VARIABLES TO MODIFY#####################
 """MetaData"""
-parentFolder = "#518" #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
-fps = 8.516436723 #Frame per second for the experiment (used only in Plot.py)
+parentFolder = "#541" #folder containing 3 children folder: Data (original data), OutputData(normalized, smoothed, etc. data),
+fps = 12.9 #Frame per second for the experiment (used only in Plot.py)
 
 """Normalization settings"""
 ThresholdsOnly=0 ##Set to 1 if you already have smoothed/normalized data and just need to re run thresholds
@@ -17,18 +17,20 @@ percentile=30 #percentile of window for normalization ##depending on how active 
 splitnorm=1 ##function to normalize individual recordings to help with changes in brightness between sessions 
 
 """Smoothing"""
-window_size = 15 #window size for smoothing. Larger is more smooth
-polynomial = 3 #polynomial order for smoothing. Smaller is more smooth
+window_size = 7 #window size for smoothing. Larger is more smooth. 15 window and 3rd order is ok for gcamp6s smoothing.
+polynomial = 6 #polynomial order for smoothing. Smaller is more smooth 6th seems to be better for 8s with the fast kinetics.
 # Choose something on the same scale as your events
 # e.g. if a transient peak lasts around 30 frames, 15 is a good starting point.
 
 """Event Detection settings"""
 varyingThreshold = False ##set to True to have each stimulation have it's own distinct threshold (not recommended)
 threshold = 0.2 # signal above threshold are considered an event
-pharmthreshold = 0.3 ##this is a secondary threshold which you can use to differentiate cutaneous vs pharmacological stimuli
+pharmthreshold = 0.4 ##this is a secondary threshold which you can use to differentiate cutaneous vs pharmacological stimuli
 SD=5 ##Threshold for SD 
 
-spikeduration=3 #minimum width of event to be considered a response. Needs to be changed for frame rates other than ~8hz
+MinimumDuration=0.25 #This is the duration (in seconds) for detecting transients, e.g. it needs to last at least this long to be detected
+#for 6s 0.5 second is usually fine. For 8s, 0.25 seconds is ok, could be shorter, but gets noisy.
+spikeduration=round(fps*MinimumDuration) #minimum width of event to be considered a response. 
 #Note that this is the width, not the number of frames. e.g. there are 4 frames above threshold (e.g. frame 100 (start) through 103 (end)) but, the end-start=3 and this is what this is checking.
 #Spike duration of 4 can work well for pharmacology, but should be reduced for natural stimulations. Also consider the frame rate in this, e.g. around a 350ms duration for natural stims seems reasonable (~4 frames at 8hz) but lower FPS means 4 frames at 4hz twice as long.
 
@@ -50,7 +52,7 @@ debugCSV = False ##this is just outputting the various other CSVs for debugging 
 
 """Plotting settings"""
 #Size of graph created by Plot.py
-SecondsPerInch=400 
+SecondsPerInch=200 
 ##you can go as low as 800 for a compact graph but it'll be hard to read.
 # ~300 the bare minimum for 15s VF spacing, but tight, ~50-100 would be better. C
 # CICADA is totally readable at 800
