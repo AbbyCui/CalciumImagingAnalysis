@@ -490,7 +490,7 @@ def getAllThresholds(debug,data,stim,fps,threshold):
             if MStim in RowsToIncludeForPharm:
                 for i in range(1,x):
                     thisThreshold = AllThresholds[MStim,i]
-                    if thisThreshold<0.3:
+                    if thisThreshold<constant.pharmthreshold:
                         AllThresholds[MStim,i]=constant.pharmthreshold
                 if debug:
                     print("shape of temp",temp.shape)
