@@ -164,6 +164,9 @@ You will need to specify the name of the file and it will name the output file t
 
 
 ### Peri-stimulus analysis
+Overall workflow
+<img width="1341" height="833" alt="image" src="https://github.com/user-attachments/assets/cf9b63d3-0263-4796-99fa-8f2d66d2be3b" />
+
 
 ## Peri-Stimulus.py
 On a plane-by-plane basis: This script extract ROIs of interest at the time window of interest, extracts the data within the peri-stimulus window (output one file ending with "Peri-stim"), and calculate mean, median, 95% range for each frame (output another file ending with "avg Peri-stim"), 
