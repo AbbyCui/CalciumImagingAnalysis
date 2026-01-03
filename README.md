@@ -162,6 +162,9 @@ By default it will assume the location of the template that it uses for matching
 You will need to specify the name of the file and it will name the output file the same name.
 ![image](https://github.com/AbbyCui/CalciumImagingAnalysis/assets/81972652/9a1e027c-1ca7-44b5-b47f-3b04118e6a1a)
 
+
+### Peri-stimulus analysis
+
 ## Peri-Stimulus.py
 On a plane-by-plane basis: This script extract ROIs of interest at the time window of interest, extracts the data within the peri-stimulus window (output one file ending with "Peri-stim"), and calculate mean, median, 95% range for each frame (output another file ending with "avg Peri-stim"), 
 Then, the script stitches the "avg Peri-stim.cvs" from all planes together, and calculate mean, median, 95% range for cells from all planes.
@@ -202,6 +205,36 @@ For all planes combined, the script will output 2 files
 2. allPlanes_avg Peri-stim (e.g. #40_allPlanes_avg Peri-stim test)
 
    This file computes mean, median, upper and lower limit of the 95% range of each frame within the timewindow for all selected cells from all planes.
+
+## StitchFiles_full_peri_stim.py
+stitches up full_peristim files for any stim x group combo
+terminal input example: 
+```
+python StitchFiles_full_peri_stim.py "#60" [40:43] inh_heat_Res
+```
+
+[40:43] indicates stim 40,41,and 42; can also input stim number seperated by comma (e.g. 1,4,5,6) or a single int (e.g. 4)
+
+output 2 files：
+1. "_avg_"+postfix +"_Stitched.csv"<img width="421" height="272" alt="image" src="https://github.com/user-attachments/assets/b05e0681-a0f0-4d8b-900a-ada82bb9cab0" />
+
+2. "_full_"+postfix+ "_Stitched.csv" <img width="920" height="208" alt="image" src="https://github.com/user-attachments/assets/512a11ef-eb3a-490b-8de7-0f424595ea89" />
+
+
+## StitchFiles_avg.py
+Stitches up full_peristim files for any stim x group combo and normalize each cell for all stimulus of that kind (e.g. heat)
+normalize, for each cell across each modality, and calculate avg +- interquartile
+input e.g.: ../#59/OutputData/#59_full_1plane 45_heat x PNs_Stitched.csv
+2 types of output:
+1. #59_normed_ 45_heat x PNs.csv
+2. output: expNumber+"stitched_avg_"+modality+".csv"<img width="1011" height="590" alt="image" src="https://github.com/user-attachments/assets/cb3a650b-74e9-4daa-9463-934b86ba4f8f" />
+
+## Stitch custom files.py
+
+This script contains a main function main_prepost(stim,postfix) wehre stim = "scr", "heat", or "cold", and postfix can be left blank (will automatically retrieve the cells that responded to the stim, or postfix = the name of the group (e.g. "PNs")
+input: normed #will need to change the parameter at the end of the script (e.g. main_prepost("heat","PNs"))
+output 1: stitch_custom_normed_stim x group (would contain both the inh and ex pop of cells that responded to the given stim; if postfix = group name, then this file would be the same 
+output 2: combines all stim for the same modality and all groups that responded to the stim (if postfix==""), or only the group specified
 
 
 **Optional Improvements**
